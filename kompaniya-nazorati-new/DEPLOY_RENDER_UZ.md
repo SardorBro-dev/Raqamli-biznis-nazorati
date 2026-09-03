@@ -1,6 +1,6 @@
 # Renderga joylashtirish
 
-Render Blueprint backend, frontend va PostgreSQL bazasini avtomatik yaratadi.
+Render Blueprint bitta web servis va PostgreSQL bazasini avtomatik yaratadi. Frontend ham FastAPI orqali shu web servisdan ochiladi.
 
 ## 1. Blueprint orqali deploy qilish
 
@@ -27,15 +27,14 @@ GEMINI_API_KEY
 
 ## 3. URL lar
 
-Blueprint quyidagi servis nomlarini ishlatadi:
+Blueprint quyidagi manzillardan foydalanadi:
 
 ```text
-Frontend: https://app-frontend.onrender.com
-Backend: https://app-backend.onrender.com
-API: https://app-backend.onrender.com/api/v1/health
+Sayt va backend: https://app-web.onrender.com
+API: https://app-web.onrender.com/api/v1/health
 ```
 
-Agar Render boshqa domen nomlarini bersa, backenddagi `FRONTEND_BASE_URL` va `CORS_ORIGINS`, frontenddagi `VITE_API_BASE_URL` qiymatlarini haqiqiy URL lar bilan yangilang va qayta deploy qiling.
+Agar Render boshqa domen nomini bersa, backenddagi `FRONTEND_BASE_URL` va `CORS_ORIGINS` qiymatlarini haqiqiy URL bilan yangilang va qayta deploy qiling. Frontend API manzili `/api/v1` bo‘lib qoladi.
 
 ## 4. Telegram bot
 

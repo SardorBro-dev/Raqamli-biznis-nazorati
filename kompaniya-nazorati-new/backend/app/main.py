@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import get_settings
 from app.database import Base, engine
@@ -45,6 +49,10 @@ app.include_router(communications_router, prefix=settings.api_v1_prefix)
 app.include_router(employees_router, prefix=settings.api_v1_prefix)
 app.include_router(work_sessions_router, prefix=settings.api_v1_prefix)
 
+frontend_dist = Path(__file__).resolve().parents[2] / "dist"
+if (frontend_dist / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=frontend_dist / "assets"), name="assets")
+
 
 @app.on_event("startup")
 async def startup_telegram_bot():
@@ -58,4 +66,16 @@ async def shutdown_telegram_bot():
 
 @app.get("/")
 def root():
+    if (frontend_dist / "index.html").exists():
+        return FileResponse(frontend_dist / "index.html")
+    return {"message": "Company platform backend is running."}
+
+
+@app.get("/{path:path}")
+def frontend_fallback(path: str):
+    requested_file = frontend_dist / path
+    if requested_file.is_file() and frontend_dist in requested_file.parents:
+        return FileResponse(requested_file)
+    if (frontend_dist / "index.html").exists():
+        return FileResponse(frontend_dist / "index.html")
     return {"message": "Company platform backend is running."}
