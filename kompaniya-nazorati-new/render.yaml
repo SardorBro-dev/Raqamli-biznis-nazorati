@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: kompaniya-nazorati-backend
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:///./data/company_platform.db
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: FRONTEND_BASE_URL
+        value: https://kompaniya-nazorati-frontend.onrender.com
+      - key: CORS_ORIGINS
+        value: https://kompaniya-nazorati-frontend.onrender.com
+      - key: API_V1_PREFIX
+        value: /api/v1
+      - key: TELEGRAM_BOT_TOKEN
+        value: ""
+      - key: TELEGRAM_API_ID
+        value: "0"
+      - key: TELEGRAM_API_HASH
+        value: ""
+      - key: TELEGRAM_CHANNEL_USERNAME
+        value: "@your_channel_username"
+      - key: TELEGRAM_CHANNEL_ID
+        value: ""
+
+  - type: static
+    name: kompaniya-nazorati-frontend
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_AUTH_MODE
+        value: backend
+      - key: VITE_API_BASE_URL
+        value: https://kompaniya-nazorati-backend.onrender.com/api/v1

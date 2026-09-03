@@ -1,0 +1,50 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+backend/data/*.db
+backend/company_live.session*
+.pytest_cache/
+
+# Local generated files
+build-output.txt
+*.apk
+android/build/
+android/app/build/
+**/build/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+secrets/
+private keys/
+*.pem
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
