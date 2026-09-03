@@ -6,12 +6,12 @@ databases:
 
 services:
   - type: web
-    name: app-web
+    name: app-backend
     env: python
     plan: free
-    rootDir: kompaniya-nazorati-new
-    buildCommand: npm install && npm run build && pip install --upgrade pip && pip install -r backend/requirements.txt
-    startCommand: cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: kompaniya-nazorati-new/backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -22,14 +22,10 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: FRONTEND_BASE_URL
-        value: https://app-web.onrender.com
+        value: https://app-frontend.onrender.com
       - key: CORS_ORIGINS
-        value: https://app-web.onrender.com
+        value: https://app-frontend.onrender.com
       - key: API_V1_PREFIX
-        value: /api/v1
-      - key: VITE_AUTH_MODE
-        value: backend
-      - key: VITE_API_BASE_URL
         value: /api/v1
       - key: TELEGRAM_BOT_TOKEN
         sync: false
@@ -43,3 +39,16 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+
+  - type: web
+    name: app-frontend
+    env: static
+    plan: free
+    rootDir: kompaniya-nazorati-new
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_AUTH_MODE
+        value: backend
+      - key: VITE_API_BASE_URL
+        value: https://app-backend.onrender.com/api/v1

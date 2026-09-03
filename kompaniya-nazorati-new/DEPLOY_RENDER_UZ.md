@@ -1,20 +1,34 @@
 # Renderga joylashtirish
 
-Render Blueprint bitta web servis va PostgreSQL bazasini avtomatik yaratadi. Frontend ham FastAPI orqali shu web servisdan ochiladi.
+Ushbu loyiha Renderda ikkita web servis va bitta PostgreSQL baza bilan ishlaydi:
 
-## 1. Blueprint orqali deploy qilish
+- `app-backend` - FastAPI backend va Telegram bot
+- `app-frontend` - React/Vite frontend
+- `app-database` - PostgreSQL baza
 
-1. GitHub repositoriyasini Renderga ulang.
-2. **New +** > **Blueprint** bo‘limini tanlang.
-3. `render.yaml` joylashgan repositoriyani tanlang.
-4. Render ko‘rsatgan maxfiy qiymatlarni kiriting va deployni boshlang.
+## Blueprint orqali o‘rnatish
 
-## 2. Kerakli maxfiy qiymatlar
+1. Render panelida **New +** > **Blueprint** ni tanlang.
+2. `raqamlibeznisnazorati-web/Raqamli-biznis-nazorati-RBN` repositorysini tanlang.
+3. Branch sifatida `main` ni tanlang.
+4. Blueprint path sifatida `render.yaml` yozing.
+5. **Deploy Blueprint** tugmasini bosing.
 
-Backend servisining **Environment** bo‘limida quyidagilarni to‘ldiring:
+## Render yaratadigan manzillar
 
 ```text
-JWT_SECRET_KEY
+Frontend: https://app-frontend.onrender.com
+Backend API: https://app-backend.onrender.com/api/v1
+Health: https://app-backend.onrender.com/api/v1/health
+```
+
+Render boshqa domen nomlarini bersa, backenddagi `FRONTEND_BASE_URL` va `CORS_ORIGINS`, frontenddagi `VITE_API_BASE_URL` qiymatlarini haqiqiy manzillar bilan almashtiring.
+
+## Backend Secrets
+
+`app-backend` servisining **Environment** bo‘limiga quyidagilarni kiriting:
+
+```text
 TELEGRAM_BOT_TOKEN
 TELEGRAM_API_ID
 TELEGRAM_API_HASH
@@ -23,19 +37,8 @@ TELEGRAM_CHANNEL_ID
 GEMINI_API_KEY
 ```
 
-`DATABASE_URL` Render PostgreSQL bazasidan avtomatik olinadi.
+`DATABASE_URL` va `JWT_SECRET_KEY` Blueprint orqali avtomatik sozlanadi.
 
-## 3. URL lar
+## Telegram bot
 
-Blueprint quyidagi manzillardan foydalanadi:
-
-```text
-Sayt va backend: https://app-web.onrender.com
-API: https://app-web.onrender.com/api/v1/health
-```
-
-Agar Render boshqa domen nomini bersa, backenddagi `FRONTEND_BASE_URL` va `CORS_ORIGINS` qiymatlarini haqiqiy URL bilan yangilang va qayta deploy qiling. Frontend API manzili `/api/v1` bo‘lib qoladi.
-
-## 4. Telegram bot
-
-Telegram qiymatlari kiritilgach, backend ishga tushishi bilan bot ham ishga tushadi. Bot tokeni yoki Telegram API qiymatlari bo‘lmasa, Telegram funksiyalari ishlamaydi, lekin saytning boshqa qismlari ishlashi davom etadi.
+Telegram qiymatlari kiritilgach, bot backend ishga tushishi bilan ishlaydi. Free tarifda servis uyquga ketishi mumkin; doimiy ishlash uchun pullik doimiy ishlash tarifidan foydalanish kerak.
