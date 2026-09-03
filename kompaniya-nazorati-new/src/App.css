@@ -642,7 +642,8 @@ input:focus, textarea:focus {
 .visual-panel span { color: #b9c4ba; font-size: 12px; }
 .visual-panel strong { color: #fff; font: 700 28px "Space Grotesk", sans-serif; }
 .visual-badge { position: absolute; z-index: 2; padding: 9px 12px; border-radius: 20px; background: var(--lime); color: var(--ink); font-size: 11px; font-weight: 700; }
-.badge-one { top: 15px; left: 0; }.badge-two { right: 0; bottom: 15px; background: var(--orange); }
+.badge-one { top: 15px; left: 0; }
+.badge-two { right: 0; bottom: 15px; background: var(--lime); color: var(--ink); box-shadow: 0 0 18px rgba(201, 242, 105, 0.18); }
 .insight-grid, .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 22px 0; }
 .metric-card, .stat-box, .stat-card { padding: 22px; border: 1px solid rgba(255,255,255,.16); border-radius: 18px; background: rgba(4, 8, 7, .24); color: #f2f8ed; box-shadow: 0 14px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 .metric-card { position: relative; overflow: hidden; display: grid; gap: 8px; border-top: 4px solid var(--teal); background: linear-gradient(145deg, rgba(40,127,113,.58), rgba(13,63,59,.5) 58%, rgba(7,21,19,.46)); color: #fff; box-shadow: 0 18px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.38), inset 0 -20px 34px rgba(0,0,0,.2); }.metric-card.green { border-color: rgba(201,242,105,.5); border-top-color: var(--lime); background: linear-gradient(145deg, rgba(184,233,101,.58), rgba(75,156,81,.5) 55%, rgba(18,60,41,.46)); color: #fff; }.metric-card.purple { border-color: rgba(242, 141, 85, .5); border-top-color: var(--orange); background: linear-gradient(145deg, rgba(217,132,104,.58), rgba(123,75,85,.5) 55%, rgba(36,28,41,.46)); color: #fff; }
