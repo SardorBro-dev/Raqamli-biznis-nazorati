@@ -14,9 +14,6 @@ function getApiBaseUrl() {
 
   const protocol = window.location.protocol || "http:";
   const hostname = window.location.hostname || "localhost";
-  if (window.location.protocol !== "file:" && hostname !== "localhost" && hostname !== "127.0.0.1") {
-    return "/api/v1";
-  }
   const normalizedHost = ["0.0.0.0", "::", "[::]", "::1", "localhost", "127.0.0.1"].includes(hostname)
     ? "localhost"
     : hostname;

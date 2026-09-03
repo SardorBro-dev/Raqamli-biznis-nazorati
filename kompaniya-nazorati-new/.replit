@@ -1,9 +1,0 @@
-run = "npm run replit:dev"
-
-[deployment]
-run = ["npm", "run", "replit:dev"]
-deploymentTarget = "cloudrun"
-
-[[ports]]
-localPort = 5000
-externalPort = 80
