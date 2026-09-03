@@ -22,7 +22,6 @@ function createWindow() {
       enableRemoteModule: false,
     },
   });
-
   if (isDev) {
     mainWindow.loadURL('http://localhost:5174');
   } else {

@@ -198,6 +198,9 @@ export const authApi = {
   checkTelegramPhone: (phone) => apiRequest(`/auth/telegram/check?phone=${encodeURIComponent(phone)}`, { method: "GET" }),
   verifyTelegramCode: (phone, code) => apiRequest("/auth/telegram/verify", { method: "POST", body: JSON.stringify({ phone, code }) }),
   requestTelegramCode: (phone) => apiRequest("/auth/telegram/request-code", { method: "POST", body: JSON.stringify({ phone }) }),
+  requestRecoveryCode: (phone) => apiRequest("/auth/recovery/request-code", { method: "POST", body: JSON.stringify({ phone }) }),
+  getRecoveryAccount: (phone) => apiRequest(`/auth/recovery/account?phone=${encodeURIComponent(phone)}`, { method: "GET" }),
+  completeRecovery: (body) => apiRequest("/auth/recovery/complete", { method: "POST", body: JSON.stringify(body) }),
   getProfile: (token) =>
     apiRequest("/users/me", {
       method: "GET",

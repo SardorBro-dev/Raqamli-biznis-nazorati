@@ -101,8 +101,8 @@ async def update_meeting_status(payload: MeetingRequest, db: Session = Depends(g
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the company owner can control meetings.")
     delivered = await notify_meeting_status(company.name, payload.started, payload.meeting_url)
     if not delivered:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Telegram user account is not connected.")
-    return {"started": payload.started, "meeting_url": payload.meeting_url or None, "delivered": True}
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Telegram userbot ulanmagan yoki kanalga Group Video Chat yaratish huquqi yo'q.")
+    return {"started": payload.started, "meeting_url": None, "delivered": True}
 
 
 @router.get("/news", response_model=list[NewsResponse])

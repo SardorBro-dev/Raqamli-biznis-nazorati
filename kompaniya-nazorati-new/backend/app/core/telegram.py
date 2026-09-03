@@ -10,11 +10,11 @@ from html import escape
 from urllib.parse import urlparse
 
 import httpx
-from telethon import TelegramClient
+from telethon import TelegramClient, functions
 
 from app.core.config import get_settings
 from app.database import SessionLocal
-from app.models import TelegramPhoneLink
+from app.models import TelegramPhoneLink, User
 
 logger = logging.getLogger(__name__)
 _verification_codes: dict[str, tuple[str, datetime]] = {}
@@ -63,6 +63,19 @@ def link_telegram_phone(phone: str, chat_id: int) -> None:
         else:
             db.add(TelegramPhoneLink(phone=normalized_phone, chat_id=str(chat_id)))
         db.commit()
+
+
+def get_linked_phone_for_chat(chat_id: int) -> str | None:
+    for phone, linked_chat_id in _telegram_chats.items():
+        if linked_chat_id == chat_id:
+            return phone
+    with SessionLocal() as db:
+        linked = db.query(TelegramPhoneLink).filter(TelegramPhoneLink.chat_id == str(chat_id)).first()
+    if linked:
+        normalized_phone = normalize_phone(linked.phone)
+        _telegram_chats[normalized_phone] = chat_id
+        return normalized_phone
+    return None
 
 
 def has_pending_phone_code(phone: str) -> bool:
@@ -266,26 +279,28 @@ async def notify_meeting_status(company_name: str, started: bool, meeting_url: s
         return False
 
     global _user_client
+    status = "boshlandi" if started else "tugatildi"
+    if started:
+        message = f"🔴 {company_name} kanalida Telegram Live Video Chat boshlandi.\n\n👉 Qo'shilish uchun ushbu kanalning Video Chat oynasiga kiring."
+    else:
+        message = f"🔴 {company_name} kompaniyasida onlayn majlis {status}."
+
     try:
         if _user_client is None:
             _user_client = TelegramClient(settings.telegram_session_name, settings.telegram_api_id, settings.telegram_api_hash)
         if not _user_client.is_connected():
             await _user_client.connect()
         if not await _user_client.is_user_authorized():
-            logger.warning("Telegram user account is not authorized.")
+            logger.warning("Telegram user account is not authorized; cannot create a real group video chat.")
             return False
 
         channel = await _user_client.get_entity(settings.telegram_channel_username.lstrip("@"))
-        status = "boshlandi" if started else "tugatildi"
-        url = build_meeting_link(company_name, meeting_url) if started else None
-        if started and url:
-            message = (
-                f"🔴 {company_name} kompaniyasida onlayn majlis boshlandi.\n\n"
-                f"👉 Qo'shilish uchun majlisga kiring\n"
-                f"{url}"
-            )
-        else:
-            message = f"🔴 {company_name} kompaniyasida onlayn majlis {status}."
+        if started:
+            await _user_client(functions.phone.CreateGroupCallRequest(
+                peer=channel,
+                random_id=secrets.randbits(31),
+                title=f"{company_name} onlayn majlisi",
+            ))
         await _user_client.send_message(channel, message)
         return True
     except Exception as error:
@@ -330,6 +345,16 @@ async def _poll_updates() -> None:
                     continue
 
                 if message.get("text", "").startswith("/start"):
+                    linked_phone = get_linked_phone_for_chat(chat_id)
+                    if linked_phone:
+                        await _send_message(
+                            client,
+                            token,
+                            chat_id,
+                            "Telefon raqamingiz allaqachon ulangan. Hisob ma'lumotlarini ko'rish uchun tugmani bosing.",
+                            {"keyboard": [[{"text": "Mening hisobim"}]], "resize_keyboard": True},
+                        )
+                        continue
                     await _send_message(
                         client,
                         token,
@@ -339,12 +364,60 @@ async def _poll_updates() -> None:
                     )
                     continue
 
+                if message.get("text", "").strip() == "Mening hisobim":
+                    linked_phone = get_linked_phone_for_chat(chat_id)
+                    if not linked_phone:
+                        await _send_message(client, token, chat_id, "Avval telefon raqamingizni ulang.")
+                        continue
+                    with SessionLocal() as db:
+                        user = db.query(User).filter(User.phone == linked_phone).first()
+                        if user is None:
+                            await _send_message(client, token, chat_id, "Bu telefon raqami bilan tizimda ro'yxatdan o'tilgan hisob topilmadi.")
+                            continue
+                        company_names = [company.name for company in user.companies]
+                        full_name = " ".join(part for part in [user.first_name, user.last_name] if part) or "Ko'rsatilmagan"
+                        company_display = ", ".join(company_names) if company_names else "Hozircha kompaniya yo'q"
+                        account_text = (
+                            "Mening hisobim\n\n"
+                            f"Ism: {full_name}\n"
+                            f"Username: {user.username}\n"
+                            f"Email: {user.email}\n"
+                            f"Telefon: {user.phone}\n"
+                            f"Rol: {user.role.value}\n"
+                            f"Holat: {'Faol' if user.is_active else 'Faol emas'}\n"
+                            f"Kompaniyalar: {company_display}"
+                        )
+                    await _send_message(
+                        client,
+                        token,
+                        chat_id,
+                        account_text,
+                        {"keyboard": [[{"text": "Mening hisobim"}]], "resize_keyboard": True},
+                    )
+                    continue
+
                 contact = message.get("contact")
                 if contact and contact.get("user_id") == chat_id:
                     phone = normalize_phone(contact.get("phone_number", ""))
                     if phone.startswith("+998") and len(phone) == 13:
+                        linked_phone = get_linked_phone_for_chat(chat_id)
+                        if linked_phone:
+                            await _send_message(
+                                client,
+                                token,
+                                chat_id,
+                                "Bu Telegram hisobiga telefon raqami allaqachon ulangan. Boshqa telefon raqamini ulash mumkin emas.",
+                                {"keyboard": [[{"text": "Mening hisobim"}]], "resize_keyboard": True},
+                            )
+                            continue
                         link_telegram_phone(phone, chat_id)
-                        await _send_message(client, token, chat_id, "Telefon raqamingiz qabul qilindi. Saytda ma'lumotlarni to'ldirib, Ro'yxatdan o'tish tugmasini bosing. Shundan keyin 12 belgili kod yuboriladi.")
+                        await _send_message(
+                            client,
+                            token,
+                            chat_id,
+                            "Telefon raqamingiz qabul qilindi. Endi boshqa raqam yuborish mumkin emas. Hisobingiz ma'lumotlarini ko'rish uchun tugmani bosing.",
+                            {"keyboard": [[{"text": "Mening hisobim"}]], "resize_keyboard": True},
+                        )
                     else:
                         await _send_message(client, token, chat_id, "Faqat O‘zbekiston telefon raqamini yuboring.")
 

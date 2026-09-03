@@ -213,6 +213,7 @@ export function RegisterPage() {
   const [success, setSuccess] = useState("");
   const [telegramCode, setTelegramCode] = useState("");
   const [codeRequested, setCodeRequested] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
@@ -352,7 +353,7 @@ export function RegisterPage() {
               checked={form.acceptTerms}
               onChange={(e) => setForm({ ...form, acceptTerms: e.target.checked })}
             />
-            <span>{t.agreeTerms}</span>
+            <span>{t.agreeTerms} <button type="button" className="terms-link" onClick={() => setTermsOpen(true)}>Foydalanish shartlari</button></span>
           </label>
           <button type="submit" className="auth-button" disabled={loading}>
             {loading ? t.creating : t.register}
@@ -364,6 +365,59 @@ export function RegisterPage() {
           <Link to="/">{t.login}</Link>
         </div>
       </div>
+      {termsOpen && <div className="terms-backdrop" role="presentation" onMouseDown={(event) => {
+        if (event.target === event.currentTarget) setTermsOpen(false);
+      }}>
+        <section className="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+          <button type="button" className="terms-close" aria-label="Shartlarni yopish" onClick={() => setTermsOpen(false)}>×</button>
+          <div className="terms-content">
+            <span className="terms-kicker">RAQAMLI BEZNIS NAZORATI</span>
+            <h2 id="terms-title">FOYDALANISH SHARTLARI</h2>
+            <p className="terms-date">Oxirgi yangilanish: 2026-yil 3-sentabr</p>
+            <p>“Raqamli Beznis Nazorati” platformasidan foydalanish orqali Siz ushbu Foydalanish shartlariga rozilik bildirasiz. Agar ushbu shartlarga rozi bo‘lmasangiz, platformadan foydalanmasligingiz kerak.</p>
+            <h3>1. Platforma haqida</h3>
+            <p>“Raqamli Beznis Nazorati” — kompaniya va tashkilotlarda ish jarayonlarini raqamli kuzatish, nazorat qilish va boshqarishga yordam beruvchi platforma.</p>
+            <p>Platformaning asosiy maqsadi:</p>
+            <ul><li>ish jarayonlarini nazorat qilish;</li><li>xodimlarning ish faoliyati haqida ma’lumot olish;</li><li>rahbarlarga boshqaruvni soddalashtirish;</li><li>ish samaradorligini oshirish;</li><li>kompaniyadagi muammolar haqida o‘z vaqtida xabar berish.</li></ul>
+            <h3>2. Foydalanuvchi hisobi</h3>
+            <p>Platformadan foydalanish uchun foydalanuvchi ro‘yxatdan o‘tishi va zarur ma’lumotlarni taqdim etishi mumkin.</p>
+            <p>Foydalanuvchi:</p>
+            <ul><li>taqdim etgan ma’lumotlarining to‘g‘riligini ta’minlashi;</li><li>hisob ma’lumotlarini himoya qilishi;</li><li>o‘z hisobidan amalga oshirilgan harakatlar uchun javobgar bo‘lishi kerak.</li></ul>
+            <p>Boshqa shaxsning hisobidan ruxsatsiz foydalanish taqiqlanadi.</p>
+            <h3>3. Kompaniya rahbari va xodimlar</h3>
+            <p>Platformadan foydalanuvchi kompaniya rahbari yoki administrator xodimlarni tizimga qo‘shishi mumkin.</p>
+            <p>Xodimlarni kuzatish yoki ular haqida ma’lumot yig‘ish amaldagi qonunchilikka muvofiq va tegishli huquqiy asoslar mavjud bo‘lgan holda amalga oshirilishi kerak.</p>
+            <p>Platforma xodimlarning shaxsiy hayotiga noqonuniy aralashish uchun ishlatilmasligi kerak.</p>
+            <h3>4. Ma’lumotlardan foydalanish</h3>
+            <p>Platforma orqali olingan ma’lumotlar faqat qonuniy va platformaning belgilangan maqsadlari doirasida ishlatilishi kerak.</p>
+            <p>Foydalanuvchi boshqa shaxslarning ma’lumotlarini:</p>
+            <ul><li>noqonuniy tarqatmasligi;</li><li>sotmasligi;</li><li>ruxsatsiz uchinchi shaxslarga bermasligi;</li><li>shaxsga zarar yetkazish maqsadida ishlatmasligi kerak.</li></ul>
+            <h3>5. Taqiqlangan foydalanish</h3>
+            <p>Platformadan quyidagi maqsadlarda foydalanish taqiqlanadi:</p>
+            <ul><li>noqonuniy faoliyatni amalga oshirish;</li><li>boshqa foydalanuvchilarga zarar yetkazish;</li><li>tizim xavfsizligini buzishga urinish;</li><li>ruxsatsiz ma’lumot olish;</li><li>platformaga zarar yetkazuvchi dasturlar yoki kodlarni joylashtirish;</li><li>boshqa shaxslarning hisoblariga ruxsatsiz kirish;</li><li>platformadan firibgarlik yoki aldov maqsadida foydalanish.</li></ul>
+            <h3>6. Xizmatning ishlashi</h3>
+            <p>“Raqamli Beznis Nazorati” xizmatni imkon qadar barqaror ishlashini ta’minlashga harakat qiladi.</p>
+            <p>Texnik xizmat, yangilanish, nosozlik yoki boshqa holatlar sababli platforma vaqtincha ishlamasligi mumkin.</p>
+            <p>Platforma ma’lumotlarning mutlaq va uzluksiz saqlanishini kafolatlamaydi. Muhim ma’lumotlarning zaxira nusxasini saqlash foydalanuvchining ham mas’uliyatidir.</p>
+            <h3>7. Hisobni cheklash yoki to‘xtatish</h3>
+            <p>Agar foydalanuvchi ushbu shartlarni buzsa yoki platformadan noqonuniy foydalansa, “Raqamli Beznis Nazorati” tegishli choralarni ko‘rishi, jumladan hisobni vaqtincha cheklashi yoki to‘xtatishi mumkin.</p>
+            <h3>8. Intellektual mulk</h3>
+            <p>Platformaning dizayni, dasturiy kodi, logotipi, nomi va boshqa original materiallari tegishli huquq egalarining intellektual mulki hisoblanadi.</p>
+            <p>Ruxsatsiz nusxalash, o‘zgartirish, tarqatish yoki tijorat maqsadida foydalanish taqiqlanadi.</p>
+            <h3>9. Foydalanuvchining javobgarligi</h3>
+            <p>Foydalanuvchi platformadan foydalanish jarayonida o‘z harakatlari va taqdim etgan ma’lumotlari uchun javobgar hisoblanadi.</p>
+            <p>“Raqamli Beznis Nazorati” platformadan noto‘g‘ri, noqonuniy yoki ushbu shartlarga zid foydalanish natijasida yuzaga keladigan oqibatlar uchun qonunchilikda belgilangan doirada javobgar bo‘ladi.</p>
+            <h3>10. Shartlarga o‘zgartirish kiritish</h3>
+            <p>Platforma rivojlanishi, yangi funksiyalar qo‘shilishi yoki qonunchilikdagi o‘zgarishlar sababli ushbu Foydalanish shartlari yangilanishi mumkin.</p>
+            <p>Yangilangan shartlar platformada e’lon qilingan kundan boshlab kuchga kiradi.</p>
+            <h3>11. Aloqa</h3>
+            <p>Platforma, hisob yoki foydalanish shartlari bo‘yicha savollar yuzaga kelganda, foydalanuvchi “Raqamli Beznis Nazorati”ning rasmiy aloqa kanallari orqali murojaat qilishi mumkin.</p>
+            <h3>12. Shartlarni qabul qilish</h3>
+            <p>“Ro‘yxatdan o‘tish”, “Kirish”, “Davom etish” yoki platformadan foydalanishni davom ettirish orqali foydalanuvchi ushbu Foydalanish shartlarini o‘qiganini va ularga roziligini tasdiqlaydi.</p>
+            <p>“Raqamli Beznis Nazorati” — biznesingizni raqamli nazorat qilish va boshqarishni soddalashtirish uchun.</p>
+          </div>
+        </section>
+      </div>}
       {codeRequested && <div className="telegram-code-backdrop" role="presentation">
         <form className="telegram-code-modal" onSubmit={handleRegister}>
           <span className="telegram-code-kicker">TELEGRAM</span>
@@ -393,19 +447,81 @@ export function RegisterPage() {
 export function RecoverAccountPage() {
   const navigate = useNavigate();
   const t = useLanguage();
+  const [phone, setPhone] = useState("+998 ");
+  const [code, setCode] = useState("");
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [codeRequested, setCodeRequested] = useState(false);
+  const [codeVerified, setCodeVerified] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRecover = (e) => {
+  const handleRecover = async (e) => {
     e.preventDefault();
-    const trimmed = username.trim();
-    if (!trimmed) {
-      setMessage(t.recoverTitle);
+    setError("");
+    setMessage("");
+    const normalizedPhone = phone.replace(/[\s()-]/g, "");
+
+    if (!/^\+998\d{9}$/.test(normalizedPhone)) {
+      setError("Telefon raqami faqat O‘zbekiston raqami bo‘lishi kerak: +998 XX XXX XX XX.");
       return;
     }
 
-    setMessage(t.recoverMessage);
-    setTimeout(() => navigate("/"), 1200);
+    try {
+      setLoading(true);
+      if (!codeRequested) {
+        await authApi.requestRecoveryCode(normalizedPhone);
+        setCodeRequested(true);
+        setMessage("Telegram botga 12 belgili kod yuborildi. Kodni kiriting.");
+        return;
+      }
+
+      if (code.length !== 12) {
+        setError("Telegram kodini to‘liq kiriting.");
+        return;
+      }
+
+      if (!codeVerified) {
+        await authApi.verifyTelegramCode(normalizedPhone, code);
+        const account = await authApi.getRecoveryAccount(normalizedPhone);
+        setUsername(account.username || "");
+        setCodeVerified(true);
+        setMessage("Kod tasdiqlandi. Endi yangi username yoki parolni kiriting.");
+        return;
+      }
+
+      if (!username.trim() && !password) {
+        setError("Username yoki yangi parol kiriting.");
+        return;
+      }
+      if (username.trim() && !/^[a-zA-Z0-9_]+$/.test(username.trim())) {
+        setError("Username faqat lotin harflari, raqam va _ belgisidan iborat bo‘lishi kerak.");
+        return;
+      }
+      if (password && password.length < 8) {
+        setError("Yangi parol kamida 8 ta belgidan iborat bo‘lishi kerak.");
+        return;
+      }
+      if (password && password !== confirmPassword) {
+        setError("Yangi parollar bir xil emas.");
+        return;
+      }
+
+      await authApi.completeRecovery({
+        phone: normalizedPhone,
+        username: username.trim() || null,
+        password: password || null,
+        confirm_password: password ? confirmPassword : null,
+      });
+      setMessage("Hisob ma’lumotlari yangilandi. Kirish sahifasiga o‘tkazilmoqda...");
+      setTimeout(() => navigate("/"), 1200);
+    } catch (err) {
+      setError(err.message || "Hisobni tiklashda xato yuz berdi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -416,14 +532,34 @@ export function RecoverAccountPage() {
           RAQAMLI BIZNES
           <span className="small">NAZORATI</span>
         </h1>
-        <p className="auth-subtitle">{t.recoverTitle}</p>
-        {message && <div className="auth-error">{message}</div>}
+        <p className="auth-subtitle">Telefon raqamingiz orqali hisobingizni tiklang</p>
+        {error && <div className="auth-error">{error}</div>}
+        {message && <div className="auth-success">{message}</div>}
         <form onSubmit={handleRecover}>
           <div className="input-group">
-            <label>{t.username}</label>
-            <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t.username} />
+            <label>Ro‘yxatdan o‘tgan telefon raqami</label>
+            <input value={phone} onChange={(e) => setPhone(formatUzbekPhone(e.target.value))} onKeyDown={handleUzbekPhoneKeyDown} placeholder="+998 90 123 45 67" autoComplete="tel" inputMode="numeric" disabled={loading || codeRequested} />
           </div>
-          <button type="submit" className="auth-button">{t.continue}</button>
+          {codeRequested && !codeVerified && <div className="input-group">
+            <label>Telegram kodi</label>
+            <input value={code} onChange={(e) => setCode(e.target.value.slice(0, 12))} placeholder="Telegram yuborgan 12 belgili kod" autoComplete="one-time-code" autoCapitalize="none" spellCheck={false} disabled={loading} />
+          </div>}
+          {codeVerified && <>
+            <div className="recovery-edit-heading">Ma’lumotlarni o‘zgartirish</div>
+            <div className="input-group">
+              <label>Username <span className="optional-label">(ixtiyoriy)</span></label>
+              <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Yangi username" autoComplete="username" disabled={loading} />
+            </div>
+            <div className="input-group">
+              <label>Yangi parol <span className="optional-label">(ixtiyoriy)</span></label>
+              <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Kamida 8 belgidan iborat parol" autoComplete="new-password" disabled={loading} />
+            </div>
+            {password && <div className="input-group">
+              <label>Yangi parolni tasdiqlash</label>
+              <PasswordInput value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Parolni qayta kiriting" autoComplete="new-password" disabled={loading} />
+            </div>}
+          </>}
+          <button type="submit" className="auth-button" disabled={loading}>{loading ? "Tekshirilmoqda..." : (!codeRequested ? "Telegram kodini olish" : (!codeVerified ? "Kodni tasdiqlash" : "Ma’lumotlarni saqlash"))}</button>
         </form>
         <div className="auth-bottom">
           <Link to="/">{t.backToLogin}</Link>

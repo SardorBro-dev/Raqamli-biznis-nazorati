@@ -29,7 +29,6 @@ import {
 
 const AUTH_MODE = import.meta.env.VITE_AUTH_MODE || "backend";
 const USE_LOCAL_EMPLOYEE_STORAGE = AUTH_MODE === "local";
-const LOCAL_MEETING_ORIGIN = "http://localhost:5173";
 
 function readImageAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -146,7 +145,6 @@ function CompanyPanel() {
   const [meetingActive, setMeetingActive] = useState(false);
   const [meetingCamera, setMeetingCamera] = useState(true);
   const [meetingMicrophone, setMeetingMicrophone] = useState(true);
-  const [meetingUrl, setMeetingUrl] = useState("");
   const [meetingError, setMeetingError] = useState("");
   const meetingStreamRef = useRef(null);
   const meetingVideoRef = useRef(null);
@@ -704,7 +702,6 @@ function CompanyPanel() {
     if (meetingVideoRef.current) {
       meetingVideoRef.current.srcObject = null;
     }
-    setMeetingUrl("");
   };
 
   const toggleMeeting = async () => {
@@ -722,40 +719,18 @@ function CompanyPanel() {
       return;
     }
 
-    if (!window.isSecureContext) {
-      setMeetingError("Kamera va mikrofon ishlashi uchun bu sahifa localhost yoki HTTPS muhitida ochilishi kerak. Iltimos, saytni localhost yoki xavfsiz HTTPS orqali qayta oching.");
-      return;
-    }
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setMeetingError("Bu brauzer kamera va mikrofonni qo'llab-quvvatlamaydi.");
-      return;
-    }
-
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      const roomName = `${(company?.name || "company").toLowerCase().trim().replace(/[^a-z0-9]+/gi, "-") || "company"}-${Date.now()}`;
-      const nextMeetingUrl = `${LOCAL_MEETING_ORIGIN}/meeting-room?room=${encodeURIComponent(roomName)}`;
-
       if (!USE_LOCAL_EMPLOYEE_STORAGE) {
         try {
-          await communicationsApi.updateMeetingStatus({ company_id: company.id, started: true, meeting_url: nextMeetingUrl }, sessionToken);
+          await communicationsApi.updateMeetingStatus({ company_id: company.id, started: true }, sessionToken);
         } catch (error) {
-          stream.getTracks().forEach((track) => track.stop());
           setMeetingError(error.message || "Telegram kanalida Live boshlanmadi.");
           return;
         }
       }
-      setMeetingUrl(nextMeetingUrl);
-      meetingStreamRef.current = stream;
       setMeetingActive(true);
-      requestAnimationFrame(() => {
-        if (meetingVideoRef.current) {
-          meetingVideoRef.current.srcObject = stream;
-        }
-      });
     } catch {
-      setMeetingError("Live boshlanmadi. Kamera va mikrofon uchun ruxsat bering.");
+      setMeetingError("Telegram kanalida Live boshlanmadi.");
     }
   };
 
@@ -1143,41 +1118,19 @@ function CompanyPanel() {
             <div className="meeting-stage">
               {meetingActive ? (
                 <>
-                  <video ref={meetingVideoRef} className="meeting-video" autoPlay muted playsInline />
-                  <div className="meeting-live-dot">● Jonli majlis</div>
-                  <strong>{company.name} jamoasi bilan uchrashuv</strong>
-                  <span>Ishtirokchilar havola orqali qo'shilishi mumkin</span>
-                  {meetingUrl && (
-                    <a href={meetingUrl} target="_blank" rel="noreferrer" className="primary-button" style={{ marginTop: "12px", display: "inline-block", textAlign: "center" }}>
-                      Majlisga qo'shilish
-                    </a>
-                  )}
+                  <div className="meeting-live-dot">● Telegram Live faol</div>
+                  <strong>{company.name} kanalidagi video chat</strong>
+                  <span>Ishtirokchilar Telegram kanalidan qo'shilishi mumkin</span>
                 </>
               ) : (
                 <>
-                  <strong>Yangi onlayn majlis boshlang</strong>
-                  <span>Kamera va mikrofonni yoqib, jamoangiz bilan bog'laning</span>
+                  <strong>Telegramda yangi video chat boshlang</strong>
+                  <span>Majlis Telegram kanalida ochiladi va ishtirokchilar shu kanaldan qo'shiladi</span>
                 </>
               )}
             </div>
             {meetingError && <div className="status-badge">{meetingError}</div>}
             <div className="meeting-controls">
-              <button className="secondary-button" type="button" onClick={() => {
-                const nextValue = !meetingCamera;
-                setMeetingCamera(nextValue);
-                meetingStreamRef.current?.getVideoTracks().forEach((track) => { track.enabled = nextValue; });
-              }}>
-                <SidebarIcon name="camera" />
-                {meetingCamera ? "Kamera yoqilgan" : "Kamera o'chirilgan"}
-              </button>
-              <button className="secondary-button" type="button" onClick={() => {
-                const nextValue = !meetingMicrophone;
-                setMeetingMicrophone(nextValue);
-                meetingStreamRef.current?.getAudioTracks().forEach((track) => { track.enabled = nextValue; });
-              }}>
-                <SidebarIcon name="speaker" />
-                {meetingMicrophone ? "Karnay yoqilgan" : "Karnay o'chirilgan"}
-              </button>
               <button className="primary-button" type="button" onClick={toggleMeeting}>
                 {meetingActive ? t.endMeeting : t.startMeeting}
               </button>

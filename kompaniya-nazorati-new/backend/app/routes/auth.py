@@ -59,6 +59,13 @@ class RegistrationCheckRequest(BaseModel):
     phone: str = Field(..., min_length=13, max_length=13)
 
 
+class RecoveryCompleteRequest(BaseModel):
+    phone: str = Field(..., min_length=13, max_length=13)
+    username: str | None = Field(default=None, min_length=3, max_length=40)
+    password: str | None = Field(default=None, min_length=8)
+    confirm_password: str | None = Field(default=None, min_length=8)
+
+
 @router.get("/telegram/check")
 def check_telegram_phone(phone: str = Query(..., min_length=13, max_length=13)):
     settings = get_settings()
@@ -99,6 +106,65 @@ def verify_telegram_code(payload: TelegramVerifyRequest):
     if not verify_phone_code(phone, payload.code):
         raise HTTPException(status_code=400, detail="Tasdiqlash kodi noto'g'ri.")
     return {"verified": True}
+
+
+@router.post("/recovery/request-code")
+async def request_recovery_code(payload: TelegramCodeRequest, db: Session = Depends(get_db)):
+    phone = payload.phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    if not re.fullmatch(r"\+998\d{9}", phone):
+        raise HTTPException(status_code=400, detail="Telefon raqami noto'g'ri.")
+    if db.query(User).filter(User.phone == phone).first() is None:
+        raise HTTPException(status_code=404, detail="Bu telefon raqami bilan ro'yxatdan o'tgan hisob topilmadi.")
+    if not is_telegram_phone_linked(phone):
+        raise HTTPException(status_code=400, detail="Avval ushbu telefon raqamini Telegram botga yuboring.")
+    if not await request_phone_code(phone):
+        raise HTTPException(status_code=503, detail="Telegram bot bilan bog'lanib bo'lmadi.")
+    return {"sent": True}
+
+
+@router.post("/recovery/complete")
+def complete_account_recovery(payload: RecoveryCompleteRequest, db: Session = Depends(get_db)):
+    phone = payload.phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    if not re.fullmatch(r"\+998\d{9}", phone):
+        raise HTTPException(status_code=400, detail="Telefon raqami noto'g'ri.")
+    if not is_phone_verified(phone):
+        raise HTTPException(status_code=403, detail="Avval Telegram kodini tasdiqlang.")
+
+    user = db.query(User).filter(User.phone == phone).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="Bu telefon raqami bilan ro'yxatdan o'tgan hisob topilmadi.")
+    if not payload.username and not payload.password:
+        raise HTTPException(status_code=400, detail="Username yoki yangi parol kiriting.")
+    if payload.password and payload.password != payload.confirm_password:
+        raise HTTPException(status_code=400, detail="Yangi parollar bir xil emas.")
+
+    if payload.username:
+        username = payload.username.strip()
+        if not re.fullmatch(r"[A-Za-z0-9_]+", username):
+            raise HTTPException(status_code=400, detail="Username faqat lotin harflari, raqam va _ belgisidan iborat bo'lishi kerak.")
+        duplicate = db.query(User).filter(User.username.ilike(username), User.id != user.id).first()
+        if duplicate:
+            raise HTTPException(status_code=400, detail="Bu username allaqachon band.")
+        user.username = username
+
+    if payload.password:
+        user.password_hash = hash_password(payload.password)
+
+    db.commit()
+    return {"updated": True, "username": user.username, "message": "Hisob ma'lumotlari yangilandi."}
+
+
+@router.get("/recovery/account")
+def get_recovery_account(phone: str = Query(..., min_length=13, max_length=13), db: Session = Depends(get_db)):
+    normalized_phone = phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    if not re.fullmatch(r"\+998\d{9}", normalized_phone):
+        raise HTTPException(status_code=400, detail="Telefon raqami noto'g'ri.")
+    if not is_phone_verified(normalized_phone):
+        raise HTTPException(status_code=403, detail="Avval Telegram kodini tasdiqlang.")
+    user = db.query(User).filter(User.phone == normalized_phone).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="Hisob topilmadi.")
+    return {"username": user.username}
 
 
 class AuthResponse(BaseModel):
