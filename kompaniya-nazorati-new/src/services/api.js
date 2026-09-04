@@ -18,6 +18,10 @@ function getApiBaseUrl() {
     return DEFAULT_PRODUCTION_API_BASE_URL;
   }
 
+  if (window.location.hostname.endsWith("replit.app") || window.location.hostname.endsWith("repl.co")) {
+    return `${window.location.protocol}//${window.location.host}/api/v1`;
+  }
+
   const protocol = window.location.protocol || "http:";
   const hostname = window.location.hostname || "localhost";
   const normalizedHost = ["0.0.0.0", "::", "[::]", "::1", "localhost", "127.0.0.1"].includes(hostname)
