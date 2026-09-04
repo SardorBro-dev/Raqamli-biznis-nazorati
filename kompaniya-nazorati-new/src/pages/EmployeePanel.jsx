@@ -26,6 +26,8 @@ function EmployeePanel() {
   const [company, setCompany] = useState(null);
   const [employee, setEmployee] = useState(null);
   const [cameraStatus, setCameraStatus] = useState("Kamera uchun ruxsat kutilmoqda...");
+  const [cameraDevices, setCameraDevices] = useState([]);
+  const [selectedCameraId, setSelectedCameraId] = useState("");
   const [micStatus, setMicStatus] = useState("Mikrofon uchun ruxsat kutilmoqda...");
   const [screenStatus, setScreenStatus] = useState("Ekran ulashish hozircha mavjud emas.");
   const [reason, setReason] = useState("");
@@ -248,26 +250,34 @@ function EmployeePanel() {
 
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
-      if (!devices.some((device) => device.kind === "videoinput")) {
+      const videoDevices = devices.filter((device) => device.kind === "videoinput");
+      if (!videoDevices.length) {
         persistPresence({ cameraEnabled: false, isOnline: true });
-        setCameraStatus("Kamera topilmadi. USB yoki kompyuter kamerasini ulang.");
+        setCameraStatus("Kamera topilmadi. Xona kamerasini USB/DVR orqali ulang.");
         return false;
       }
       stopMediaStreams("camera");
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: selectedCameraId ? { deviceId: { exact: selectedCameraId } } : true,
+      });
       registerMediaStream(stream, "camera");
       const video = document.getElementById("camera-preview");
       if (video) {
         video.srcObject = stream;
       }
       persistPresence({ cameraEnabled: true, isOnline: true });
-      setCameraStatus("Kamera ruxsati berildi. Rahbaringiz hozir kamerani ko'ra oladi.");
+      const refreshedDevices = (await navigator.mediaDevices.enumerateDevices())
+        .filter((device) => device.kind === "videoinput");
+      setCameraDevices(refreshedDevices);
+      const activeDeviceId = stream.getVideoTracks()[0]?.getSettings?.().deviceId;
+      if (activeDeviceId) setSelectedCameraId(activeDeviceId);
+      setCameraStatus("Xona kamerasi ulandi. Rahbaringiz hozir kamerani ko'ra oladi.");
       return true;
       
     } catch (error) {
       persistPresence({ cameraEnabled: false, isOnline: true });
       setCameraStatus(error.name === "NotFoundError"
-        ? "Kamera topilmadi. USB yoki kompyuter kamerasini ulang."
+        ? "Kamera topilmadi. Xona kamerasini USB/DVR orqali ulang."
         : `Kamera ruxsati berilmagan: ${error.name}`);
       return false;
     }
@@ -499,6 +509,11 @@ function EmployeePanel() {
               <button className="primary-button" onClick={requestMicrophone}>Mikrofonni yoqish</button>
               <button className="primary-button" onClick={shareScreen}>Ekranni ulashish</button>
             </div>
+            {cameraDevices.length > 1 && <label className="input-group">Xona kamerasini tanlang
+              <select value={selectedCameraId} onChange={(event) => setSelectedCameraId(event.target.value)}>
+                {cameraDevices.map((device, index) => <option key={device.deviceId} value={device.deviceId}>{device.label || `Kamera ${index + 1}`}</option>)}
+              </select>
+            </label>}
             <p>{cameraStatus}</p>
             <p>{micStatus}</p>
             <p>{screenStatus}</p>
