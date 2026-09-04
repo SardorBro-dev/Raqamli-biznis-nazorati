@@ -1,0 +1,7 @@
+run = "cd kompaniya-nazorati-new && npm ci && npm run build && cd backend && pip install -r requirements.txt && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+[deployment]
+run = "cd kompaniya-nazorati-new && npm ci && npm run build && cd backend && pip install -r requirements.txt && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+[env]
+PYTHONPATH = "kompaniya-nazorati-new/backend"
