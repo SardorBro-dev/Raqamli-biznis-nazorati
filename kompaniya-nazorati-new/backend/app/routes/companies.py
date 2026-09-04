@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Company, Subscription, SubscriptionPlan, RoleEnum
+from app.core.telegram import notify_channel_event
 from app.routes.users import get_current_user
 
 router = APIRouter(prefix="/companies", tags=["companies"])
@@ -219,7 +220,7 @@ def get_public_companies(
 
 
 @router.post("/upgrade-plan")
-def upgrade_plan(
+async def upgrade_plan(
     payload: PlanUpgradeRequest,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -243,6 +244,10 @@ def upgrade_plan(
         subscription.plan_id = plan.id
         subscription.purchased_at = datetime.utcnow()
     db.commit()
+    await notify_channel_event(
+        "Kompaniya tarifi yangilandi",
+        f"Foydalanuvchi: {current_user.username}\nTarif: {plan.code}",
+    )
     return {"plan": plan.code, "company_limit": plan.company_limit}
 
 
@@ -278,7 +283,7 @@ def get_company(
 
 
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_company(
+async def delete_company(
     company_id: str,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -304,11 +309,15 @@ def delete_company(
         employee.user.is_active = False
 
     db.commit()
+    await notify_channel_event(
+        "Kompaniya o'chirildi",
+        f"Kompaniya: {company.name}\nFoydalanuvchi: {current_user.username}",
+    )
     return None
 
 
 @router.post("", response_model=CompanyResponse, status_code=status.HTTP_201_CREATED)
-def create_company(
+async def create_company(
     payload: CompanyCreateRequest,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user),
@@ -382,5 +391,12 @@ def create_company(
     )
     db.add(subscription_obj)
     db.commit()
+    await notify_channel_event(
+        "Yangi kompaniya yaratildi",
+        f"Kompaniya: {company.name}\n"
+        f"Sohasi: {company.industry}\n"
+        f"Egasi: {current_user.username}\n"
+        f"Tarif: {plan.code}",
+    )
     
     return serialize_company(company, plan.code)

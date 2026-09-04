@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
-from app.core.telegram import forward_company_chat_message, notify_meeting_status
+from app.core.telegram import forward_company_chat_message, notify_channel_event, notify_meeting_status
 from app.database import get_db
 from app.models import Company, Message, News, User, RoleEnum
 from app.routes.users import get_current_user
@@ -112,7 +112,7 @@ def list_news(company_id: str, db: Session = Depends(get_db), current_user: User
 
 
 @router.post("/news", response_model=NewsResponse, status_code=status.HTTP_201_CREATED)
-def create_news(payload: NewsRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def create_news(payload: NewsRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     company = get_company_access(payload.company_id, current_user, db)
     if company.owner_id != current_user.id and current_user.role != RoleEnum.MANAGER:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only managers can publish news.")
@@ -120,17 +120,31 @@ def create_news(payload: NewsRequest, db: Session = Depends(get_db), current_use
     db.add(item)
     db.commit()
     db.refresh(item)
+    await notify_channel_event(
+        "Yangi yangilik e'lon qilindi",
+        f"Kompaniya: {company.name}\n"
+        f"Sarlavha: {item.title}\n"
+        f"Muallif: {user_display_name(current_user)}\n\n"
+        f"{item.description}",
+    )
     return item
 
 
 @router.delete("/news/{news_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_news(news_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def delete_news(news_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     item = db.query(News).filter(News.id == news_id).first()
     if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="News not found.")
     company = get_company_access(item.company_id, current_user, db)
     if company.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the owner can delete news.")
+    news_title = item.title
     db.delete(item)
     db.commit()
+    await notify_channel_event(
+        "Yangilik o'chirildi",
+        f"Kompaniya: {company.name}\n"
+        f"Yangilik: {news_title}\n"
+        f"O'chirgan foydalanuvchi: {user_display_name(current_user)}",
+    )
     return None

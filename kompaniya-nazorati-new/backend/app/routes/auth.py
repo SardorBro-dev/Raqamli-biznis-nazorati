@@ -20,7 +20,7 @@ from app.core.security import (
 from app.core.config import get_settings
 from app.database import get_db
 from app.models import User, SubscriptionPlan, RoleEnum
-from app.core.telegram import has_pending_phone_code, is_phone_verified, is_telegram_phone_linked, notify_account_created, request_phone_code, verify_phone_code
+from app.core.telegram import has_pending_phone_code, is_phone_verified, is_telegram_phone_linked, notify_account_created, notify_channel_event, request_phone_code, verify_phone_code
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -244,6 +244,14 @@ async def register_user(payload: RegisterRequest, db: Session = Depends(get_db))
     refresh_token = create_refresh_token(new_user.id, session_id=session_id)
 
     await notify_account_created(phone, new_user.username, new_user.email)
+    registered_name = new_user.first_name or "Ko'rsatilmagan"
+    await notify_channel_event(
+        "Yangi foydalanuvchi ro'yxatdan o'tdi",
+        f"Ism: {registered_name}\n"
+        f"Username: {new_user.username}\n"
+        f"Email: {new_user.email}\n"
+        f"Telefon: {new_user.phone}",
+    )
 
     return AuthResponse(
         message="User registered successfully.",

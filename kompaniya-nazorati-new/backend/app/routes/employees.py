@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.security import create_access_token, create_refresh_token, hash_password, verify_password, start_session
+from app.core.telegram import notify_channel_event
 from app.database import get_db
 from app.models import User, Company, Employee, Subscription, WorkSession, RoleEnum
 from app.routes.users import get_current_user
@@ -58,7 +59,7 @@ class WorkSessionStatusResponse(BaseModel):
 
 
 @router.post("", response_model=EmployeeResponse, status_code=status.HTTP_201_CREATED)
-def create_employee(
+async def create_employee(
     payload: EmployeeCreateRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -143,6 +144,14 @@ def create_employee(
     db.add(employee)
     db.commit()
     db.refresh(employee)
+    await notify_channel_event(
+        "Yangi xodim qo'shildi",
+        f"Kompaniya: {company.name}\n"
+        f"Xodim: {employee.first_name} {employee.last_name}\n"
+        f"Username: {employee_user.username}\n"
+        f"Lavozim: {employee.position}\n"
+        f"Qo'shgan foydalanuvchi: {current_user.username}",
+    )
 
     return EmployeeResponse(
         id=employee.id,
@@ -212,7 +221,7 @@ def get_my_employee_profile(
 
 
 @router.patch("/{employee_id}", response_model=EmployeeResponse)
-def update_employee(
+async def update_employee(
     employee_id: str,
     payload: EmployeeUpdateRequest,
     db: Session = Depends(get_db),
@@ -245,6 +254,13 @@ def update_employee(
 
     db.commit()
     db.refresh(employee)
+    await notify_channel_event(
+        "Xodim ma'lumotlari yangilandi",
+        f"Kompaniya: {employee.company.name}\n"
+        f"Xodim: {employee.first_name} {employee.last_name}\n"
+        f"Username: {employee_user.username}\n"
+        f"Yangilagan foydalanuvchi: {current_user.username}",
+    )
     return EmployeeResponse(
         id=employee.id,
         user_id=employee.user_id,
@@ -260,7 +276,7 @@ def update_employee(
 
 
 @router.delete("/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
-def fire_employee(
+async def fire_employee(
     employee_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -275,6 +291,13 @@ def fire_employee(
     employee.is_online = False
     employee.user.is_active = False
     db.commit()
+    await notify_channel_event(
+        "Xodim ishdan bo'shatildi",
+        f"Kompaniya: {employee.company.name}\n"
+        f"Xodim: {employee.first_name} {employee.last_name}\n"
+        f"Username: {employee.user.username}\n"
+        f"Amalni bajargan foydalanuvchi: {current_user.username}",
+    )
     return None
 
 

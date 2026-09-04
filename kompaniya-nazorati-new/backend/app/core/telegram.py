@@ -146,6 +146,23 @@ async def notify_account_created(phone: str, username: str, email: str) -> bool:
         return False
 
 
+async def notify_channel_event(title: str, details: str) -> bool:
+    settings = get_settings()
+    token = settings.telegram_bot_token
+    channel_id = settings.telegram_channel_id.strip()
+    if not token or not channel_id:
+        return False
+
+    text = f"{title}\n\n{details}".strip()
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await _send_message(client, token, channel_id, text)
+        return True
+    except httpx.HTTPError as error:
+        logger.warning("Telegram channel event notification failed: %s", error)
+        return False
+
+
 async def notify_phone_changed(old_phone: str, new_phone: str, username: str, email: str) -> None:
     old_chat_id = _telegram_chats.get(normalize_phone(old_phone))
     new_chat_id = _telegram_chats.get(normalize_phone(new_phone))

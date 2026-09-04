@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app.core.telegram import notify_channel_event
 from app.database import get_db
 from app.models import WorkSession, Employee, User
 from app.routes.users import get_current_user
@@ -16,7 +17,7 @@ class WorkSessionRequest(BaseModel):
 
 
 @router.post("/start")
-def start_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def start_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee_id = payload.employee_id
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if employee is None:
@@ -45,12 +46,17 @@ def start_work(payload: WorkSessionRequest, db: Session = Depends(get_db), curre
     )
     db.add(session)
     db.commit()
+    await notify_channel_event(
+        "Xodim ishni boshladi",
+        f"Kompaniya: {employee.company.name}\n"
+        f"Xodim: {employee.user.username}\nHolat: Ishlayapti",
+    )
     
     return {"employee_id": employee_id, "status": "working"}
 
 
 @router.post("/break")
-def break_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def break_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee_id = payload.employee_id
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if employee is None:
@@ -69,12 +75,17 @@ def break_work(payload: WorkSessionRequest, db: Session = Depends(get_db), curre
     session.status = "on_break"
     session.break_start_time = datetime.utcnow()
     db.commit()
+    await notify_channel_event(
+        "Xodim tanaffusga chiqdi",
+        f"Kompaniya: {employee.company.name}\n"
+        f"Xodim: {employee.user.username}\nHolat: Tanaffus",
+    )
     
     return {"employee_id": employee_id, "status": "on_break"}
 
 
 @router.post("/resume")
-def resume_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def resume_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee_id = payload.employee_id
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if employee is None:
@@ -95,12 +106,17 @@ def resume_work(payload: WorkSessionRequest, db: Session = Depends(get_db), curr
     break_duration = (session.break_end_time - session.break_start_time).total_seconds() // 60
     session.total_break_minutes += int(break_duration)
     db.commit()
+    await notify_channel_event(
+        "Xodim ishga qaytdi",
+        f"Kompaniya: {employee.company.name}\n"
+        f"Xodim: {employee.user.username}\nHolat: Ishlayapti",
+    )
     
     return {"employee_id": employee_id, "status": "working"}
 
 
 @router.post("/end")
-def end_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def end_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     employee_id = payload.employee_id
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if employee is None:
@@ -125,5 +141,11 @@ def end_work(payload: WorkSessionRequest, db: Session = Depends(get_db), current
     employee.is_online = False
     employee.last_activity = datetime.utcnow()
     db.commit()
+    await notify_channel_event(
+        "Xodim ishni tugatdi",
+        f"Kompaniya: {employee.company.name}\n"
+        f"Xodim: {employee.user.username}\n"
+        f"Ishlagan daqiqa: {session.total_work_minutes}",
+    )
     
     return {"employee_id": employee_id, "status": "not_working"}

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.security import create_access_token, create_refresh_token, decode_token, hash_password, is_active_session
 from app.database import get_db
 from app.models import User
-from app.core.telegram import is_phone_verified, is_telegram_phone_linked, notify_phone_changed
+from app.core.telegram import is_phone_verified, is_telegram_phone_linked, notify_channel_event, notify_phone_changed
 
 router = APIRouter(prefix="/users", tags=["users"])
 _background_modes: dict[str, str] = {}
@@ -149,6 +149,13 @@ async def update_current_profile(
     db.refresh(current_user)
     if previous_phone and previous_phone != current_user.phone:
         await notify_phone_changed(previous_phone, current_user.phone, current_user.username, current_user.email)
+    profile_name = " ".join(filter(None, [current_user.first_name, current_user.last_name])) or "Ko'rsatilmagan"
+    await notify_channel_event(
+        "Foydalanuvchi profili yangilandi",
+        f"Username: {current_user.username}\n"
+        f"Ism: {profile_name}\n"
+        f"Email: {current_user.email}",
+    )
     return {
         "id": current_user.id,
         "username": current_user.username,
