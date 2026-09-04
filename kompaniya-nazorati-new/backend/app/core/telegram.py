@@ -377,10 +377,11 @@ async def _poll_updates() -> None:
                         company_names = [company.name for company in user.companies]
                         full_name = " ".join(part for part in [user.first_name, user.last_name] if part) or "Ko'rsatilmagan"
                         company_display = ", ".join(company_names) if company_names else "Hozircha kompaniya yo'q"
+                        registered_username = str(user.username or "").strip().lstrip("@") or "Ko'rsatilmagan"
                         account_text = (
                             "Mening hisobim\n\n"
                             f"Ism: {full_name}\n"
-                            f"Username: {user.username}\n"
+                            f"Username: @{registered_username}\n"
                             f"Email: {user.email}\n"
                             f"Telefon: {user.phone}\n"
                             f"Rol: {user.role.value}\n"

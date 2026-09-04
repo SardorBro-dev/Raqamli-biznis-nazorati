@@ -9,7 +9,7 @@ Ushbu loyiha Renderda ikkita web servis va bitta PostgreSQL baza bilan ishlaydi:
 ## Blueprint orqali o‘rnatish
 
 1. Render panelida **New +** > **Blueprint** ni tanlang.
-2. `raqamlibeznisnazorati-web/Raqamli-biznis-nazorati-RBN` repositorysini tanlang.
+2. `SardorBro-dev/Raqamli-biznis-nazorati` repositorysini tanlang.
 3. Branch sifatida `main` ni tanlang.
 4. Blueprint path sifatida `render.yaml` yozing.
 5. **Deploy Blueprint** tugmasini bosing.
@@ -37,7 +37,7 @@ TELEGRAM_CHANNEL_ID
 GEMINI_API_KEY
 ```
 
-`DATABASE_URL` va `JWT_SECRET_KEY` Blueprint orqali avtomatik sozlanadi.
+`DATABASE_URL` va `JWT_SECRET_KEY` Blueprint orqali avtomatik sozlanadi. Backend ishga tushganda Alembic migratsiyalari ham avtomatik bajariladi.
 
 ## Telegram bot
 

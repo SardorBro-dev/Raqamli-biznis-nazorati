@@ -7,7 +7,7 @@ import {
   setCurrentSession,
 } from "../utils/storage";
 
-const DEFAULT_PRODUCTION_API_BASE_URL = "https://app-backend-pure.onrender.com/api/v1";
+const DEFAULT_PRODUCTION_API_BASE_URL = "https://app-backend.onrender.com/api/v1";
 
 function getApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) {
@@ -16,10 +16,6 @@ function getApiBaseUrl() {
 
   if (window.location.hostname.endsWith("onrender.com")) {
     return DEFAULT_PRODUCTION_API_BASE_URL;
-  }
-
-  if (window.location.hostname.endsWith("replit.app") || window.location.hostname.endsWith("repl.co")) {
-    return `${window.location.protocol}//${window.location.host}/api/v1`;
   }
 
   const protocol = window.location.protocol || "http:";
