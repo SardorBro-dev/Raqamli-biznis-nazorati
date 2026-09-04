@@ -381,7 +381,7 @@ async def _poll_updates() -> None:
                         account_text = (
                             "Mening hisobim\n\n"
                             f"Ism: {full_name}\n"
-                            f"Username: @{registered_username}\n"
+                            f"Username: {registered_username}\n"
                             f"Email: {user.email}\n"
                             f"Telefon: {user.phone}\n"
                             f"Rol: {user.role.value}\n"
