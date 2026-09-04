@@ -14,11 +14,13 @@ depends_on = None
 
 
 def upgrade() -> None:
+    connection = op.get_bind()
+    if any(column["name"] == "work_type" for column in sa.inspect(connection).get_columns("employees")):
+        return
     op.add_column(
         "employees",
         sa.Column("work_type", sa.String(length=20), nullable=False, server_default="computer"),
     )
-    op.alter_column("employees", "work_type", server_default=None)
 
 
 def downgrade() -> None:
