@@ -22,9 +22,9 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: FRONTEND_BASE_URL
-        value: https://app-frontend.onrender.com
+        value: https://app-frontend-zww4.onrender.com
       - key: CORS_ORIGINS
-        value: https://app-frontend.onrender.com
+        value: https://app-frontend-zww4.onrender.com
       - key: API_V1_PREFIX
         value: /api/v1
       - key: TELEGRAM_BOT_TOKEN
