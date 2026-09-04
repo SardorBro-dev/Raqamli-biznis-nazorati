@@ -7,9 +7,15 @@ import {
   setCurrentSession,
 } from "../utils/storage";
 
+const DEFAULT_PRODUCTION_API_BASE_URL = "https://app-backend-pure.onrender.com/api/v1";
+
 function getApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
+  }
+
+  if (window.location.hostname.endsWith("onrender.com")) {
+    return DEFAULT_PRODUCTION_API_BASE_URL;
   }
 
   const protocol = window.location.protocol || "http:";
