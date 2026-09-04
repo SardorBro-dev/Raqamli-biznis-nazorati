@@ -116,6 +116,7 @@ class Employee(Base):
     phone = Column(String(20), nullable=True)
     email = Column(String(255), nullable=True)
     work_schedule = Column(String(100), nullable=True)
+    work_type = Column(String(20), nullable=False, default="computer")
     work_start_time = Column(String(10), nullable=True)
     work_end_time = Column(String(10), nullable=True)
     break_start = Column(String(10), nullable=True)

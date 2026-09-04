@@ -114,6 +114,7 @@ function CompanyPanel() {
     position: "",
     department: "",
     status: "active",
+    workType: "computer",
   });
   const [employeeForm, setEmployeeForm] = useState({
     name: "",
@@ -129,6 +130,7 @@ function CompanyPanel() {
     breakDuration: "60",
     breakStart: "13:00",
     breakEnd: "14:00",
+    workType: "computer",
   });
   const [settingsForm, setSettingsForm] = useState({
     name: "",
@@ -354,6 +356,7 @@ function CompanyPanel() {
           username,
           temporary_password: password,
           work_schedule: `${workStart}-${workEnd}`,
+          work_type: employeeForm.workType,
         }, currentSession.token);
 
         const [responseWorkStart, responseWorkEnd] = (response.work_schedule || "09:00-18:00").split("-");
@@ -371,11 +374,12 @@ function CompanyPanel() {
           isOnline: response.status === "working",
           lastActivity: null,
           currentTask: "Yangi xodim",
+          workType: response.work_type || employeeForm.workType,
         };
 
         setEmployees((currentEmployees) => [...currentEmployees, remoteEmployee]);
         setShowEmployeeForm(false);
-        setEmployeeForm({ name: "", residence: "", phone: "", gender: "", position: "", username: "", password: "", isOnline: false, workStart: "09:00", workEnd: "18:00", breakDuration: "60", breakStart: "13:00", breakEnd: "14:00" });
+        setEmployeeForm({ name: "", residence: "", phone: "", gender: "", position: "", username: "", password: "", isOnline: false, workStart: "09:00", workEnd: "18:00", breakDuration: "60", breakStart: "13:00", breakEnd: "14:00", workType: "computer" });
         setMessageStatus(`Xodim yaratildi. Login: ${username} | Parol: ${password}`);
       } catch (requestError) {
         setMessageStatus(requestError.message || "Xodim qo'shishda xatolik yuz berdi.");
@@ -404,6 +408,7 @@ function CompanyPanel() {
         username,
         password,
         isOnline: employeeForm.isOnline,
+        workType: employeeForm.workType,
         workStart,
         workEnd,
         breakStart,
@@ -433,6 +438,7 @@ function CompanyPanel() {
       breakEnd,
       lastActivity: new Date().toISOString(),
       isOnline: employeeForm.isOnline,
+      workType: employeeForm.workType,
       idleTime: 0,
       currentTask: "Yangi xodim",
       todayWorkTime: 0,
@@ -443,7 +449,7 @@ function CompanyPanel() {
 
     setEmployees((currentEmployees) => [...currentEmployees, newEmployee]);
     setShowEmployeeForm(false);
-    setEmployeeForm({ name: "", residence: "", phone: "", gender: "", position: "", username: "", password: "", isOnline: false, workStart: "09:00", workEnd: "18:00", breakDuration: "60", breakStart: "13:00", breakEnd: "14:00" });
+    setEmployeeForm({ name: "", residence: "", phone: "", gender: "", position: "", username: "", password: "", isOnline: false, workStart: "09:00", workEnd: "18:00", breakDuration: "60", breakStart: "13:00", breakEnd: "14:00", workType: "computer" });
     setMessageStatus(`Xodim yaratildi. Login: ${username} | Parol: ${password}`);
   };
 
@@ -469,6 +475,7 @@ function CompanyPanel() {
           department: nextData.department || undefined,
           status: nextData.status || undefined,
           is_online: nextData.isOnline,
+          work_type: nextData.workType,
         }, currentSession?.token);
         setEmployees((currentEmployees) => currentEmployees.map((item) => (
           item.id === employeeId
@@ -479,6 +486,7 @@ function CompanyPanel() {
               position: response.position,
               department: response.department,
               status: response.status,
+              workType: response.work_type || nextData.workType,
             }
             : item
         )));
@@ -523,6 +531,7 @@ function CompanyPanel() {
       department: employee.department || "Umumiy",
       status: employee.status === "on_leave" ? "on_leave" : "active",
       isOnline: Boolean(employee.isOnline),
+      workType: employee.workType || "computer",
     });
     setMessageStatus("");
   };
@@ -1000,7 +1009,7 @@ function CompanyPanel() {
                 <input value={employeeForm.position} onChange={(e) => setEmployeeForm({ ...employeeForm, position: e.target.value })} placeholder="Xodim lavozimi" />
                 <input value={employeeForm.username} onChange={(e) => setEmployeeForm({ ...employeeForm, username: e.target.value })} placeholder="Username" />
                 <PasswordInput value={employeeForm.password} onChange={(e) => setEmployeeForm({ ...employeeForm, password: e.target.value })} placeholder="Parol" />
-                <select value={employeeForm.isOnline ? "computer" : "physical"} onChange={(e) => setEmployeeForm({ ...employeeForm, isOnline: e.target.value === "computer" })} aria-label="Xodim ish turi">
+                        <select value={employeeForm.workType} onChange={(e) => setEmployeeForm({ ...employeeForm, workType: e.target.value, isOnline: e.target.value === "computer" })} aria-label="Xodim ish turi">
                   <option value="computer">Kompyuterda ishlaydi</option>
                   <option value="physical">Jismoniy mehnat qiladi</option>
                 </select>
@@ -1061,7 +1070,7 @@ function CompanyPanel() {
                         <PasswordInput value={editEmployeeForm.password} onChange={(event) => setEditEmployeeForm({ ...editEmployeeForm, password: event.target.value })} placeholder="Yangi parol (ixtiyoriy)" />
                         <input value={editEmployeeForm.position} onChange={(event) => setEditEmployeeForm({ ...editEmployeeForm, position: event.target.value })} placeholder="Ish maqomi" />
                         <input value={editEmployeeForm.department} onChange={(event) => setEditEmployeeForm({ ...editEmployeeForm, department: event.target.value })} placeholder="Bo'lim" />
-                        <select value={editEmployeeForm.isOnline ? "computer" : "physical"} onChange={(event) => setEditEmployeeForm({ ...editEmployeeForm, isOnline: event.target.value === "computer" })} aria-label="Xodim ish turi">
+                        <select value={editEmployeeForm.workType} onChange={(event) => setEditEmployeeForm({ ...editEmployeeForm, workType: event.target.value, isOnline: event.target.value === "computer" })} aria-label="Xodim ish turi">
                           <option value="computer">Kompyuterda ishlaydi</option>
                           <option value="physical">Jismoniy mehnat qiladi</option>
                         </select>

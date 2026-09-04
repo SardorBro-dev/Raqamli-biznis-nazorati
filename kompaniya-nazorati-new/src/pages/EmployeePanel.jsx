@@ -156,6 +156,7 @@ function EmployeePanel() {
           workEnd,
           breakStart: "13:00",
           breakEnd: "14:00",
+          workType: response.work_type || "computer",
           isOnline: response.status === "working",
           backend: true,
         });
@@ -246,6 +247,12 @@ function EmployeePanel() {
     }
 
     try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      if (!devices.some((device) => device.kind === "videoinput")) {
+        persistPresence({ cameraEnabled: false, isOnline: true });
+        setCameraStatus("Kamera topilmadi. USB yoki kompyuter kamerasini ulang.");
+        return false;
+      }
       stopMediaStreams("camera");
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       registerMediaStream(stream, "camera");
@@ -255,10 +262,14 @@ function EmployeePanel() {
       }
       persistPresence({ cameraEnabled: true, isOnline: true });
       setCameraStatus("Kamera ruxsati berildi. Rahbaringiz hozir kamerani ko'ra oladi.");
+      return true;
       
     } catch (error) {
       persistPresence({ cameraEnabled: false, isOnline: true });
-      setCameraStatus(`Kamera ruxsati berilmagan: ${error.name}`);
+      setCameraStatus(error.name === "NotFoundError"
+        ? "Kamera topilmadi. USB yoki kompyuter kamerasini ulang."
+        : `Kamera ruxsati berilmagan: ${error.name}`);
+      return false;
     }
   };
 
@@ -392,6 +403,10 @@ function EmployeePanel() {
     if (!employee) return;
 
     try {
+      if (action === "start" && employee.workType === "physical") {
+        const cameraReady = await requestCamera();
+        if (!cameraReady) return;
+      }
       if (employee.backend) {
         const response = await workSessionsApi[action](employee.id, getCurrentSession()?.token);
         setWorkStatus(response.status);
@@ -461,7 +476,7 @@ function EmployeePanel() {
             </div>
             <div className="media-controls">
               {workStatus === "not_working" || workStatus === "completed" ? (
-                <button className="primary-button" onClick={() => changeWorkStatus("start")}>{t.startMeeting}</button>
+                <button className="primary-button" onClick={() => changeWorkStatus("start")}>Ishga kirish</button>
               ) : null}
               {workStatus === "working" ? (
                 <button className="secondary-button" onClick={() => changeWorkStatus("break")}>{t.notStarted}</button>

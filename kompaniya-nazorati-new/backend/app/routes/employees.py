@@ -24,6 +24,7 @@ class EmployeeCreateRequest(BaseModel):
     username: str = Field(..., min_length=3, max_length=40)
     temporary_password: str | None = Field(default="TempPass123!", min_length=8)
     work_schedule: str | None = Field(default="09:00-18:00", min_length=2, max_length=80)
+    work_type: str = Field(default="computer", pattern="^(computer|physical)$")
 
 
 class EmployeeUpdateRequest(BaseModel):
@@ -36,6 +37,7 @@ class EmployeeUpdateRequest(BaseModel):
     status: str | None = Field(default=None, pattern="^(active|on_leave)$")
     work_schedule: str | None = Field(default=None, min_length=2, max_length=80)
     is_online: bool | None = None
+    work_type: str | None = Field(default=None, pattern="^(computer|physical)$")
 
 
 class EmployeeResponse(BaseModel):
@@ -49,6 +51,7 @@ class EmployeeResponse(BaseModel):
     username: str
     status: str = "not_working"
     work_schedule: str
+    work_type: str = "computer"
 
 
 class WorkSessionStatusResponse(BaseModel):
@@ -134,6 +137,7 @@ async def create_employee(
         position=payload.position,
         department=payload.department,
         work_schedule=payload.work_schedule or "09:00-18:00",
+        work_type=payload.work_type,
         status=payload.status,
         is_online=False,
         idle_time=0,
@@ -164,6 +168,7 @@ async def create_employee(
         username=payload.username,
         status="not_working",
         work_schedule=employee.work_schedule,
+        work_type=employee.work_type or "computer",
     )
 
 
@@ -192,6 +197,7 @@ def list_employees(
             username=employee.user.username,
             status="fired" if employee.status == "fired" else ("not_working" if not employee.is_online else employee.status),
             work_schedule=employee.work_schedule or "09:00-18:00",
+            work_type=employee.work_type or "computer",
         )
         for employee in employees
     ]
@@ -217,6 +223,7 @@ def get_my_employee_profile(
         username=current_user.username,
         status="fired" if employee.status == "fired" else ("not_working" if not employee.is_online else employee.status),
         work_schedule=employee.work_schedule or "09:00-18:00",
+        work_type=employee.work_type or "computer",
     )
 
 
@@ -251,6 +258,8 @@ async def update_employee(
             setattr(employee, field, value)
     if payload.is_online is not None:
         employee.is_online = payload.is_online
+    if payload.work_type is not None:
+        employee.work_type = payload.work_type
 
     db.commit()
     db.refresh(employee)
@@ -272,6 +281,7 @@ async def update_employee(
         username=employee_user.username,
         status="fired" if employee.status == "fired" else ("not_working" if not employee.is_online else employee.status),
         work_schedule=employee.work_schedule or "09:00-18:00",
+        work_type=employee.work_type or "computer",
     )
 
 
