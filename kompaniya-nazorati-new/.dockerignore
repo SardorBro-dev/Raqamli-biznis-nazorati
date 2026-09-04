@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log*
+dist
+.venv
+backend/.venv
+backend/data
+backend/__pycache__
+backend/company_live.session*
+.pytest_cache
+android/build
+android/app/build
+.env
+.env.*
+!.env.example
+*.apk
