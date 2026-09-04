@@ -204,6 +204,7 @@ function CompanyPanel() {
               workEnd,
               status: item.status,
               isOnline: item.status !== "not_working",
+              workType: item.work_type || "computer",
               currentTask: "",
             };
           }));
@@ -619,6 +620,32 @@ function CompanyPanel() {
     });
   };
 
+  const permanentlyDeleteEmployee = async (employee) => {
+    const confirmed = window.confirm(`${employee.name} nomli xodimni butunlay o'chirib yubormoqchimisiz?`);
+    if (!confirmed || !employee.id) return;
+
+    if (!USE_LOCAL_EMPLOYEE_STORAGE) {
+      const currentSession = getCurrentSession();
+      try {
+        await employeeApi.permanentlyDelete(employee.id, currentSession?.token);
+        setEmployees((currentEmployees) => currentEmployees.filter((item) => item.id !== employee.id));
+        setMessageStatus(`${employee.name} butunlay o'chirib yuborildi.`);
+      } catch (requestError) {
+        setMessageStatus(requestError.message || "Xodimni butunlay o'chirib bo'lmadi.");
+      }
+      return;
+    }
+
+    const companyEmployees = readStorage(STORAGE_KEYS.employees, []);
+    const users = readStorage(STORAGE_KEYS.users, []);
+    const updatedEmployees = companyEmployees.filter((item) => item.id !== employee.id);
+    const updatedUsers = users.filter((user) => user.id !== employee.userId);
+    writeStorage(STORAGE_KEYS.employees, updatedEmployees);
+    writeStorage(STORAGE_KEYS.users, updatedUsers);
+    setEmployees(updatedEmployees.filter((item) => item.companyId === company.id));
+    setMessageStatus(`${employee.name} butunlay o'chirib yuborildi.`);
+  };
+
   const saveSettings = (event) => {
     event.preventDefault();
     if (!company) return;
@@ -949,25 +976,9 @@ function CompanyPanel() {
                       Username: {emp.username}<br/>
                       Ish maqomi: {emp.position || "Xodim"}<br/>
                       Bo'lim: {emp.department || "Umumiy"}
-                      <button 
+                      <button
                         className="danger-button" 
-                        onClick={() => {
-                          const confirm = window.confirm(`${emp.name} nomli xodimni butunlay o'chirib yubormoqchimisiz?`);
-                          if (confirm && emp.id) {
-                            const companyEmployees = readStorage(STORAGE_KEYS.employees, []);
-                            const users = readStorage(STORAGE_KEYS.users, []);
-                            const updatedEmployees = companyEmployees.filter((item) => (
-                              !(item.id === emp.id && item.companyId === company.id)
-                            ));
-                            const updatedUsers = users.filter((user) => (
-                              !(user.id === emp.userId && user.companyId === company.id)
-                            ));
-                            writeStorage(STORAGE_KEYS.employees, updatedEmployees);
-                            writeStorage(STORAGE_KEYS.users, updatedUsers);
-                            setEmployees(updatedEmployees.filter((item) => item.companyId === company.id));
-                            setMessageStatus(`${emp.name} butunlay o'chirib yuborildi.`);
-                          }
-                        }}
+                        onClick={() => permanentlyDeleteEmployee(emp)}
                         style={{ marginTop: "8px", fontSize: "11px", padding: "4px 8px" }}
                       >
                         O'chirish

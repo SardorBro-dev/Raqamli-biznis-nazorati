@@ -302,6 +302,10 @@ export const employeeApi = {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   }),
+  permanentlyDelete: (employeeId, token) => apiRequest(`/employees/${employeeId}/permanent`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }),
 };
 
 export const workSessionsApi = {

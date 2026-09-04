@@ -311,6 +311,37 @@ async def fire_employee(
     return None
 
 
+@router.delete("/{employee_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)
+async def permanently_delete_employee(
+    employee_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if employee is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found.")
+    if employee.company.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't manage this employee.")
+    if employee.status != "fired":
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Avval xodimni ishdan bo'shating.")
+
+    employee_name = f"{employee.first_name} {employee.last_name}"
+    employee_username = employee.user.username
+    company_name = employee.company.name
+    db.query(WorkSession).filter(WorkSession.employee_id == employee.id).delete(synchronize_session=False)
+    db.delete(employee)
+    db.delete(employee.user)
+    db.commit()
+    await notify_channel_event(
+        "Ishdan bo'shatilgan xodim butunlay o'chirildi",
+        f"Kompaniya: {company_name}\n"
+        f"Xodim: {employee_name}\n"
+        f"Username: {employee_username}\n"
+        f"O'chirgan foydalanuvchi: {current_user.username}",
+    )
+    return None
+
+
 @router.get("/{employee_id}/status", response_model=WorkSessionStatusResponse)
 def get_employee_status(
     employee_id: str,
