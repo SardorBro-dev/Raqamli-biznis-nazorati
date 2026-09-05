@@ -69,6 +69,41 @@
 .monetization-trust { color: var(--lime); }.monetization-trust span { background: var(--lime); box-shadow: 0 0 14px rgba(201,242,105,.35); }
 .monetization-card-button { background: var(--lime); color: #07100b; box-shadow: 0 12px 28px rgba(201,242,105,.2); }.monetization-card-button:hover { background: #e1ff9a; color: #07100b; box-shadow: 0 14px 34px rgba(201,242,105,.3); }
 
+/* Match employee creation with the current dark translucent panel design. */
+.panel-shell .content-card > .inline-form {
+	margin: 20px 0 24px;
+	padding: 22px;
+	border: 1px solid rgba(255, 255, 255, .1);
+	border-radius: 16px;
+	background: rgba(4, 8, 7, .42);
+	box-shadow: none;
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+}
+.panel-shell .content-card > .inline-form input,
+.panel-shell .content-card > .inline-form select,
+.panel-shell .content-card > .inline-form .password-input-wrapper input {
+	min-height: 46px;
+	border-color: rgba(255, 255, 255, .14);
+	border-radius: 10px;
+	background: rgba(0, 0, 0, .34);
+	color: #f2f8ed;
+}
+.panel-shell .content-card > .inline-form input:focus,
+.panel-shell .content-card > .inline-form select:focus {
+	border-color: var(--lime);
+	background: rgba(0, 0, 0, .52);
+	box-shadow: 0 0 0 3px rgba(var(--lime-rgb), .1);
+	transform: none;
+}
+.panel-shell .content-card > .inline-form .time-field {
+	gap: 6px;
+	color: #cfe0d3;
+	font-size: 11px;
+	font-weight: 700;
+}
+.panel-shell .content-card > .inline-form .time-field input { margin-top: 0; }
+
 
 /* Keep dashboard status cards calm so the data remains the visual focus. */
 .dashboard-main > .stats-grid .stat-card {
