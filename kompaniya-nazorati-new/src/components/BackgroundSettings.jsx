@@ -126,7 +126,7 @@ function BackgroundSettings() {
         <div className="background-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setOpen(false)}>
           <section className="background-modal" role="dialog" aria-modal="true" aria-labelledby="background-modal-title" onClick={(event) => event.stopPropagation()}>
             <div className="background-modal-header">
-              <div><span className="page-location">KN / MEDIA</span><h2 id="background-modal-title">{t.backgroundTitle}</h2></div>
+              <div><span className="page-location">RBN / MEDIA</span><h2 id="background-modal-title">{t.backgroundTitle}</h2></div>
               <button className="modal-close" type="button" aria-label={t.close} onClick={(event) => { event.stopPropagation(); setOpen(false); }}>×</button>
             </div>
             <p className="background-modal-description">{t.backgroundDescription}</p>
