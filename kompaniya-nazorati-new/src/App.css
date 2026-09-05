@@ -1003,7 +1003,8 @@ input:focus, textarea:focus {
 	box-shadow: none !important;
 }
 .dashboard-main > .stats-grid .stat-card {
-	background: rgba(4, 8, 7, .16) !important;
+	background: transparent !important;
+	background-image: none !important;
 	border-color: rgba(255, 255, 255, .07) !important;
 }
 .dashboard-main > .stats-grid .stat-card .stat-icon,
