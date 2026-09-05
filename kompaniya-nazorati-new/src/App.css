@@ -68,6 +68,27 @@
 .monetization-card-preview { border: 1px solid rgba(201,242,105,.5); background: linear-gradient(135deg, #050806 0%, #111c17 58%, #1e6a63 100%); box-shadow: 0 18px 34px rgba(0,0,0,.42), inset 0 0 0 1px rgba(201,242,105,.08); }
 .monetization-trust { color: var(--lime); }.monetization-trust span { background: var(--lime); box-shadow: 0 0 14px rgba(201,242,105,.35); }
 .monetization-card-button { background: var(--lime); color: #07100b; box-shadow: 0 12px 28px rgba(201,242,105,.2); }.monetization-card-button:hover { background: #e1ff9a; color: #07100b; box-shadow: 0 14px 34px rgba(201,242,105,.3); }
+
+/* Keep dashboard status cards calm so the data remains the visual focus. */
+.dashboard-main > .stats-grid .stat-card {
+	background: rgba(17, 21, 19, .78);
+	border: 1px solid rgba(255, 255, 255, .1);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+.dashboard-main > .stats-grid .stat-card .stat-icon {
+	background: rgba(255, 255, 255, .06);
+	border: 1px solid rgba(255, 255, 255, .12);
+	color: var(--lime);
+}
+.dashboard-main > .stats-grid .stat-card .stat-icon.blue { color: #7db8c9; }
+.dashboard-main > .stats-grid .stat-card .stat-icon.purple { color: #b39acb; }
+.dashboard-main > .stats-grid .stat-card .stat-icon.green { color: var(--lime); }
+.dashboard-main > .stats-grid .stat-card .stat-icon.orange { color: #d89a78; }
+.dashboard-main > .stats-grid .stat-card .stat-badge {
+	background: rgba(var(--lime-rgb), .12);
+	border: 1px solid rgba(var(--lime-rgb), .28);
+	color: var(--lime);
+}
 .monetization-page .monetization-card-button, .monetization-page .monetization-card-button:hover { box-shadow: none !important; }
 .monetization-page .card-order-modal .primary-wallet-button, .monetization-page .card-order-modal .primary-wallet-button:hover { box-shadow: none !important; }
 
