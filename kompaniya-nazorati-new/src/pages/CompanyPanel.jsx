@@ -1068,6 +1068,12 @@ function CompanyPanel() {
                       )}
                       <button
                         className="danger-button"
+                        onClick={() => permanentlyDeleteEmployee(employee)}
+                      >
+                        O'chirish
+                      </button>
+                      <button
+                        className="danger-button"
                         onClick={() => fireEmployee(employee)}
                         disabled={employee.status === "fired"}
                       >

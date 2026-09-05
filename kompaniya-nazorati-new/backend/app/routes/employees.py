@@ -322,9 +322,6 @@ async def permanently_delete_employee(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found.")
     if employee.company.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't manage this employee.")
-    if employee.status != "fired":
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Avval xodimni ishdan bo'shating.")
-
     employee_name = f"{employee.first_name} {employee.last_name}"
     employee_username = employee.user.username
     company_name = employee.company.name
