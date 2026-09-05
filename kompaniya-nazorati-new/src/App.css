@@ -1055,6 +1055,14 @@ html body button:focus-visible {
 	background: rgba(0, 0, 0, .24) !important;
 	box-shadow: none !important;
 }
+html body button.password-toggle,
+html body button.password-toggle:hover:not(:disabled),
+html body button.password-toggle:focus-visible {
+	background: transparent !important;
+	background-image: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
 
 /* Final dashboard card treatment: translucent, flat, and intentionally quiet. */
 .dashboard-main > .stats-grid .stat-card {
