@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "../styles/ColorThemeSelector.css";
+import { getCurrentUser } from "../utils/storage";
 
 const DEFAULT_COLOR = "#c9f269";
 const DEFAULT_DARK = "#89a83c";
@@ -71,17 +72,19 @@ export default function ColorThemeSelector() {
   const isDefaultColor = customColor.toLowerCase() === DEFAULT_COLOR;
 
   useEffect(() => {
-    const savedCustom = localStorage.getItem("app-custom-color");
-    
-    if (savedCustom) {
-      setCustomColor(savedCustom);
-      applyCustomTheme(savedCustom);
-    } else {
-      applyCustomTheme(DEFAULT_COLOR);
-    }
+    const applyStoredTheme = (sessionUser = getCurrentUser()) => {
+      const savedCustom = sessionUser ? localStorage.getItem("app-custom-color") : null;
+      if (!sessionUser) localStorage.removeItem("app-custom-color");
+      applyCustomTheme(savedCustom || DEFAULT_COLOR, { persist: Boolean(sessionUser) });
+    };
+
+    applyStoredTheme();
+    const handleSessionChange = (event) => applyStoredTheme(event.detail?.user || event.detail);
+    window.addEventListener("app-session-change", handleSessionChange);
+    return () => window.removeEventListener("app-session-change", handleSessionChange);
   }, []);
 
-  const applyCustomTheme = (color) => {
+  const applyCustomTheme = (color, { persist = Boolean(getCurrentUser()) } = {}) => {
     const root = document.documentElement;
     const darkColor = darkenColor(color);
     const tealColor = rotateHue(mixColors(color, "#111513", .62), 155);
@@ -92,7 +95,8 @@ export default function ColorThemeSelector() {
     root.style.setProperty("--teal", tealColor);
     root.style.setProperty("--orange", orangeColor);
     root.style.setProperty("--lime-rgb", `${rgb.red}, ${rgb.green}, ${rgb.blue}`);
-    localStorage.setItem("app-custom-color", color);
+    if (persist) localStorage.setItem("app-custom-color", color);
+    else localStorage.removeItem("app-custom-color");
     window.dispatchEvent(new CustomEvent("app-theme-change", { detail: { color } }));
     setCustomColor(color);
   };
