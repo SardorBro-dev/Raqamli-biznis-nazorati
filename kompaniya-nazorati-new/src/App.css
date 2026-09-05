@@ -69,6 +69,7 @@
 .monetization-trust { color: var(--lime); }.monetization-trust span { background: var(--lime); box-shadow: 0 0 14px rgba(201,242,105,.35); }
 .monetization-card-button { background: var(--lime); color: #07100b; box-shadow: 0 12px 28px rgba(201,242,105,.2); }.monetization-card-button:hover { background: #e1ff9a; color: #07100b; box-shadow: 0 14px 34px rgba(201,242,105,.3); }
 
+
 /* Keep dashboard status cards calm so the data remains the visual focus. */
 .dashboard-main > .stats-grid .stat-card {
 	background: rgba(4, 8, 7, .46) !important;
@@ -979,6 +980,28 @@ input:focus, textarea:focus {
 .brand-icon, .tariffs-brand-icon { box-shadow: 5px 5px 0 var(--lime), 0 0 18px rgba(30,106,99,.34), inset 0 1px 0 rgba(255,255,255,.18); }
 .monetization-mark { box-shadow: 7px 7px 0 var(--lime), 0 0 24px rgba(30,106,99,.42), inset 0 1px 0 rgba(255,255,255,.18); }
 @keyframes logo-breathe-strong { 0%, 100% { box-shadow: 6px 6px 0 var(--lime), 0 0 18px rgba(30,106,99,.3), inset 0 1px 0 rgba(255,255,255,.16); } 50% { box-shadow: 6px 6px 0 var(--lime), 0 0 32px rgba(201,242,105,.34), inset 0 1px 0 rgba(255,255,255,.24); } }
+
+/* Final dashboard card treatment: translucent, flat, and intentionally quiet. */
+.dashboard-main > .stats-grid .stat-card {
+	background: rgba(4, 8, 7, .32) !important;
+	border: 1px solid rgba(255, 255, 255, .08) !important;
+	box-shadow: none !important;
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	transform: none !important;
+}
+.dashboard-main > .stats-grid .stat-card::before,
+.dashboard-main > .stats-grid .stat-card::after { display: none !important; }
+.dashboard-main > .stats-grid .stat-card .stat-icon {
+	background: transparent !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+.dashboard-main > .stats-grid .stat-card .stat-badge {
+	background: transparent !important;
+	border: 1px solid rgba(var(--lime-rgb), .22) !important;
+	box-shadow: none !important;
+}
 
 .monetization-page { background: #070b09; background-image: radial-gradient(circle at 50% 46%, rgba(30,106,99,.3), transparent 38%); }
 .monetization-page { background-color: rgba(7, 11, 9, .72); }
