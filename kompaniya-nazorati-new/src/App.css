@@ -1046,13 +1046,13 @@ input:focus, textarea:focus {
 
 /* Unified button surface: dark translucent interior without gradients or 3D shadows. */
 html body button {
-	background: rgba(0, 0, 0, .32) !important;
+	background: rgba(0, 0, 0, .14) !important;
 	background-image: none !important;
 	box-shadow: none !important;
 }
 html body button:hover:not(:disabled),
 html body button:focus-visible {
-	background: rgba(0, 0, 0, .48) !important;
+	background: rgba(0, 0, 0, .24) !important;
 	box-shadow: none !important;
 }
 
