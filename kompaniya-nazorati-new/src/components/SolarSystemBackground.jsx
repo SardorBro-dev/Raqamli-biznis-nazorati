@@ -84,17 +84,15 @@ function SolarSystemBackground({ preview = false }) {
     container.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0x527d70, 0x020403, .65));
-    const sunLight = new THREE.PointLight(themeColor, 5, 50, 1.35);
+    const sunLight = new THREE.PointLight(0xdfff83, 5, 50, 1.35);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(1024, 1024);
     scene.add(sunLight);
 
-    const sunMaterial = new THREE.MeshBasicMaterial({ color: themeColor });
-    themedMaterials.push(sunMaterial);
+    const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xdfff83 });
     const sun = new THREE.Mesh(new THREE.SphereGeometry(1.25, 32, 32), sunMaterial);
     scene.add(sun);
-    const sunGlowMaterial = new THREE.MeshBasicMaterial({ color: themeColor, transparent: true, opacity: .1, side: THREE.BackSide });
-    themedMaterials.push(sunGlowMaterial);
+    const sunGlowMaterial = new THREE.MeshBasicMaterial({ color: 0xc9f269, transparent: true, opacity: .1, side: THREE.BackSide });
     scene.add(new THREE.Mesh(
       new THREE.SphereGeometry(1.8, 32, 32),
       sunGlowMaterial
@@ -182,7 +180,6 @@ function SolarSystemBackground({ preview = false }) {
 
     const handleThemeChange = (event) => {
       const nextColor = new THREE.Color(event.detail?.color || "#c9f269");
-      sunLight.color.copy(nextColor);
       themedMaterials.forEach((material) => material.color.copy(nextColor));
     };
     window.addEventListener("app-theme-change", handleThemeChange);
