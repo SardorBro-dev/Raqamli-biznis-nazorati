@@ -1002,6 +1002,22 @@ input:focus, textarea:focus {
 	border: 1px solid rgba(var(--lime-rgb), .22) !important;
 	box-shadow: none !important;
 }
+.dashboard-main > .stats-grid .stat-card {
+	background: rgba(4, 8, 7, .16) !important;
+	border-color: rgba(255, 255, 255, .07) !important;
+}
+.dashboard-main > .stats-grid .stat-card .stat-icon,
+.dashboard-main > .stats-grid .stat-card .stat-icon.blue,
+.dashboard-main > .stats-grid .stat-card .stat-icon.purple,
+.dashboard-main > .stats-grid .stat-card .stat-icon.green,
+.dashboard-main > .stats-grid .stat-card .stat-icon.orange {
+	background: transparent !important;
+	color: var(--lime) !important;
+	border-color: transparent !important;
+}
+.dashboard-main > .stats-grid .stat-card .stat-badge {
+	color: var(--lime) !important;
+}
 
 .monetization-page { background: #070b09; background-image: radial-gradient(circle at 50% 46%, rgba(30,106,99,.3), transparent 38%); }
 .monetization-page { background-color: rgba(7, 11, 9, .72); }
