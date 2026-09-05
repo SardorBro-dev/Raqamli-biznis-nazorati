@@ -3,6 +3,7 @@ const ICON_PATHS = {
   company: "M3 18h14M5 18V7l5-3 5 3v11M8 10h1m3 0h1m-5 3h1m3 0h1M9 18v-3h2v3",
   users: "M6.5 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 17a4.5 4.5 0 0 1 9 0M15 10a2.5 2.5 0 1 0 0-5M13 13.5a4 4 0 0 1 5 3.5",
   create: "M10 4v12M4 10h12",
+  close: "M5 5l10 10M15 5 5 15",
   plan: "M3 7h14v9H3zM3 10h14M6 13h3",
   card: "M3 6h14v10H3zM3 9h14M6 13h3",
   chart: "M4 16V9M8 16V6M12 16v-4M16 16V4",

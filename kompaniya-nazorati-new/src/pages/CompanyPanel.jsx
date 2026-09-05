@@ -998,12 +998,12 @@ function CompanyPanel() {
                 <SidebarIcon name="users" />
                 {t.employees.replace(/^👥\s*/u, "")}
               </h3>
-              <button className="primary-button employee-add-button" onClick={() => {
+              <button className="primary-button employee-add-button" type="button" onClick={() => {
                 setShowEmployeeForm((isVisible) => !isVisible);
                 setMessageStatus("");
               }}>
-                <SidebarIcon name="create" />
-                {t.addEmployee.replace(/^\+\s*/u, "")}
+                <SidebarIcon name={showEmployeeForm ? "close" : "create"} />
+                {showEmployeeForm ? "Bekor qilish" : t.addEmployee.replace(/^\+\s*/u, "")}
               </button>
             </div>
 
