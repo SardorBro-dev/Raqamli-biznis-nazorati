@@ -581,6 +581,17 @@ input:focus, textarea:focus {
 .telegram-code-backdrop { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 20px; background: rgba(2, 7, 5, .7); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
 .telegram-code-modal { width: min(100%, 360px); padding: 26px; border: 1px solid rgba(201, 242, 105, .46); border-radius: 16px; background: linear-gradient(145deg, rgba(16, 27, 21, .98), rgba(4, 10, 7, .98)); color: #fff; box-shadow: 0 24px 70px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .08); }
 .telegram-code-kicker { color: var(--lime); font-size: 10px; font-weight: 800; letter-spacing: .16em; }.telegram-code-modal h2 { margin: 8px 0 6px; font: 700 22px "Space Grotesk", sans-serif; }.telegram-code-modal p { margin: 0 0 18px; color: #b9c4ba; font-size: 13px; }.telegram-code-modal input { width: 100%; box-sizing: border-box; padding: 13px 14px; border: 1px solid rgba(201, 242, 105, .34); border-radius: 10px; background: rgba(0, 4, 3, .62); color: #fff; font: 700 18px "Space Grotesk", sans-serif; letter-spacing: .16em; text-align: center; }.telegram-code-modal .auth-button { margin-top: 14px; }
+.telegram-code-backdrop .telegram-code-modal button.auth-button {
+	background: rgba(0, 0, 0, .14) !important;
+	background-image: none !important;
+	border-color: rgba(var(--lime-rgb), .5) !important;
+	color: var(--lime) !important;
+	box-shadow: none !important;
+}
+.telegram-code-backdrop .telegram-code-modal button.auth-button:hover:not(:disabled) {
+	background: rgba(0, 0, 0, .24) !important;
+	border-color: var(--lime) !important;
+}
 .auth-success { background: #edf8d5; color: #526c20; padding: 12px; border-radius: 12px; margin: 12px 0; }
 .checkbox-row { display: flex; align-items: center; gap: 9px; text-align: left; color: var(--ink-soft); font-size: 13px; margin: 18px 0; }
 .checkbox-row input { width: auto; accent-color: var(--teal); }
