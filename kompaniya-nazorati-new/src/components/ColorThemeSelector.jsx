@@ -93,6 +93,7 @@ export default function ColorThemeSelector() {
     root.style.setProperty("--orange", orangeColor);
     root.style.setProperty("--lime-rgb", `${rgb.red}, ${rgb.green}, ${rgb.blue}`);
     localStorage.setItem("app-custom-color", color);
+    window.dispatchEvent(new CustomEvent("app-theme-change", { detail: { color } }));
     setCustomColor(color);
   };
 

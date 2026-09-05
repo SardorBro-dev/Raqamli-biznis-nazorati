@@ -67,6 +67,8 @@ function SolarSystemBackground({ preview = false }) {
       height: container.clientHeight || window.innerHeight,
     });
     const dimensions = getDimensions();
+    const themeColor = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue("--lime").trim() || "#c9f269");
+    const themedMaterials = [];
     const camera = new THREE.PerspectiveCamera(60, dimensions.width / dimensions.height, .1, 180);
     camera.position.set(0, preview ? 7 : 12, preview ? Math.max(24, 28 / camera.aspect) : Math.max(38, 42 / camera.aspect));
     camera.lookAt(0, 0, 0);
@@ -82,19 +84,20 @@ function SolarSystemBackground({ preview = false }) {
     container.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0x527d70, 0x020403, .65));
-    const sunLight = new THREE.PointLight(0xdfff83, 5, 50, 1.35);
+    const sunLight = new THREE.PointLight(themeColor, 5, 50, 1.35);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(1024, 1024);
     scene.add(sunLight);
 
-    const sun = new THREE.Mesh(
-      new THREE.SphereGeometry(1.25, 32, 32),
-      new THREE.MeshBasicMaterial({ color: 0xdfff83 })
-    );
+    const sunMaterial = new THREE.MeshBasicMaterial({ color: themeColor });
+    themedMaterials.push(sunMaterial);
+    const sun = new THREE.Mesh(new THREE.SphereGeometry(1.25, 32, 32), sunMaterial);
     scene.add(sun);
+    const sunGlowMaterial = new THREE.MeshBasicMaterial({ color: themeColor, transparent: true, opacity: .1, side: THREE.BackSide });
+    themedMaterials.push(sunGlowMaterial);
     scene.add(new THREE.Mesh(
       new THREE.SphereGeometry(1.8, 32, 32),
-      new THREE.MeshBasicMaterial({ color: 0xc9f269, transparent: true, opacity: .1, side: THREE.BackSide })
+      sunGlowMaterial
     ));
 
     const planets = PLANETS.map((definition) => {
@@ -117,9 +120,11 @@ function SolarSystemBackground({ preview = false }) {
         const angle = (index / 96) * Math.PI * 2;
         return new THREE.Vector3(Math.cos(angle) * definition.distance, 0, Math.sin(angle) * definition.distance);
       });
+      const orbitLineMaterial = new THREE.LineBasicMaterial({ color: themeColor, transparent: true, opacity: .2 });
+      themedMaterials.push(orbitLineMaterial);
       orbit.add(new THREE.LineLoop(
         new THREE.BufferGeometry().setFromPoints(points),
-        new THREE.LineBasicMaterial({ color: 0x9bcf72, transparent: true, opacity: .2 })
+        orbitLineMaterial
       ));
 
       if (definition.ring) {
@@ -158,7 +163,9 @@ function SolarSystemBackground({ preview = false }) {
     const starGeometry = new THREE.BufferGeometry();
     starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
     const starBasePositions = starPositions.slice();
-    const starField = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xc9f269, size: .09, transparent: true, opacity: .82, fog: false }));
+    const starMaterial = new THREE.PointsMaterial({ color: themeColor, size: .09, transparent: true, opacity: .82, fog: false });
+    themedMaterials.push(starMaterial);
+    const starField = new THREE.Points(starGeometry, starMaterial);
     scene.add(starField);
 
     const galaxyPositions = new Float32Array(1200);
@@ -172,6 +179,13 @@ function SolarSystemBackground({ preview = false }) {
     const galaxyBasePositions = galaxyPositions.slice();
     const galaxy = new THREE.Points(galaxyGeometry, new THREE.PointsMaterial({ color: 0x8bd5ae, size: .14, transparent: true, opacity: .78, depthWrite: false, fog: false }));
     scene.add(galaxy);
+
+    const handleThemeChange = (event) => {
+      const nextColor = new THREE.Color(event.detail?.color || "#c9f269");
+      sunLight.color.copy(nextColor);
+      themedMaterials.forEach((material) => material.color.copy(nextColor));
+    };
+    window.addEventListener("app-theme-change", handleThemeChange);
 
     const startTime = performance.now();
     const pointer = { x: 0, y: 0 };
@@ -221,6 +235,7 @@ function SolarSystemBackground({ preview = false }) {
       window.cancelAnimationFrame(frameId);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("app-theme-change", handleThemeChange);
       renderer.dispose();
       container.removeChild(renderer.domElement);
     };
