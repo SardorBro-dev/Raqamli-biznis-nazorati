@@ -584,13 +584,13 @@ input:focus, textarea:focus {
 .telegram-code-backdrop .telegram-code-modal button.auth-button {
 	background: rgba(0, 0, 0, .14) !important;
 	background-image: none !important;
-	border-color: rgba(var(--lime-rgb), .5) !important;
+	border: 1px solid var(--lime) !important;
 	color: var(--lime) !important;
 	box-shadow: none !important;
 }
 .telegram-code-backdrop .telegram-code-modal button.auth-button:hover:not(:disabled) {
 	background: rgba(0, 0, 0, .24) !important;
-	border-color: var(--lime) !important;
+	border: 1px solid var(--lime) !important;
 }
 .auth-success { background: #edf8d5; color: #526c20; padding: 12px; border-radius: 12px; margin: 12px 0; }
 .checkbox-row { display: flex; align-items: center; gap: 9px; text-align: left; color: var(--ink-soft); font-size: 13px; margin: 18px 0; }
