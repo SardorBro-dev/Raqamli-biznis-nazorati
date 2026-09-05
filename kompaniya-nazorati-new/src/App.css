@@ -1074,6 +1074,18 @@ html body button.password-toggle:focus-visible {
 	border: 0 !important;
 	box-shadow: none !important;
 }
+html body button.color-theme-button,
+html body button.background-settings-button {
+	background: rgba(17, 28, 23, .86) !important;
+	background-image: none !important;
+	border-color: rgba(201, 242, 105, .3) !important;
+	box-shadow: none !important;
+}
+html body button.color-theme-button:hover:not(:disabled),
+html body button.background-settings-button:hover:not(:disabled) {
+	background: rgba(17, 28, 23, .86) !important;
+	border-color: var(--lime) !important;
+}
 
 /* Final dashboard card treatment: translucent, flat, and intentionally quiet. */
 .dashboard-main > .stats-grid .stat-card {
